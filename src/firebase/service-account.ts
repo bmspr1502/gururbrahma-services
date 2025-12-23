@@ -1,12 +1,31 @@
-export const serviceAccount = {
-  "type": "service_account",
-  "project_id": "studio-5159116962-cf239",
-  "private_key_id": "893c52a05d8f6d70d740c497424d54d24f0c90f2",
-  "private_key": "private-key-is-a-secret",
-  "client_email": "firebase-adminsdk-3y4re@studio-5159116962-cf239.iam.gserviceaccount.com",
-  "client_id": "116538407981502444655",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-3y4re%40studio-5159116962-cf239.iam.gserviceaccount.com"
+
+import type { ServiceAccount } from 'firebase-admin/app';
+
+// This function now reads from environment variables
+// to construct the service account object securely.
+export function getServiceAccount(): ServiceAccount {
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !privateKey
+  ) {
+    console.warn(
+      'Firebase server environment variables are not set. Admin features will not work. Please set them in your .env.local file.'
+    );
+    // Return a dummy service account to avoid crashing the server.
+    // This allows the rest of the app to function during development.
+    return {
+      projectId: 'your-project-id',
+      clientEmail: 'your-client-email@example.com',
+      privateKey: 'your-private-key',
+    };
+  }
+
+  return {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: privateKey,
+  };
 }
