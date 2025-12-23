@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import * as Icons from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -12,7 +13,8 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
-  const Icon = service.icon;
+  // Resolve icon component client-side from a string key to avoid passing functions
+  const Icon = (Icons as any)[service.icon] ?? Icons.Home;
 
   return (
     <motion.div

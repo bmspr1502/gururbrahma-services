@@ -1,6 +1,6 @@
-import type React from 'react';
+import type React from "react";
 
-export type ServiceCategory = 'Purohitam' | 'Jyotisham' | 'Matrimony';
+export type ServiceCategory = "Purohitam" | "Jyotisham" | "Matrimony";
 
 export type Service = {
   id: string;
@@ -9,7 +9,8 @@ export type Service = {
   description: string;
   price: string;
   detailedHtml: string;
-  icon: React.ComponentType<{ className?: string }>;
+  // store icon as a string key (resolved client-side) to avoid passing functions
+  icon: string;
   image: string;
 };
 
@@ -26,6 +27,6 @@ export type Video = {
   id: string;
   youtubeUrl: string;
   title: string;
-  type: 'short' | 'video';
+  type: "short" | "video";
   timestamp: Date;
 };
