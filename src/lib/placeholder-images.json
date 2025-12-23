@@ -71,6 +71,18 @@
       "description": "A profile photo of the priest.",
       "imageUrl": "https://images.unsplash.com/photo-1661870832676-c580197bc5b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxpbmRpYW4lMjBtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjY0MjE2MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "indian man portrait"
+    },
+    {
+      "id": "post-3",
+      "description": "A person meditating.",
+      "imageUrl": "https://images.unsplash.com/photo-1594894986493-13e5141e8f99?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwaGluZHV8ZW58MHx8fHwxNzY2NTc0NTAwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hindu meditation"
+    },
+    {
+      "id": "post-4",
+      "description": "A modern home with good vastu.",
+      "imageUrl": "https://images.unsplash.com/photo-1600585154340-be6164a83639?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjbGVhbiUyMG1vZGVybiUyMGhvbWV8ZW58MHx8fHwxNzY2NTc0NTAwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern home"
     }
   ]
 }

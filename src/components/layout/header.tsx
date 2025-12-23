@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
+import { Logo } from '@/components/logo';
 
 const navLinks = [
   { name: 'Home', href: '/' },
+  { name: 'About', href: '/about' },
   { name: 'Services', href: '/services' },
   { name: 'Astrology & Posts', href: '/posts' },
   { name: 'Contact', href: '/contact' },
@@ -20,9 +21,9 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-primary/80 text-primary-foreground backdrop-blur-lg shadow-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-accent" />
-          <span className="text-xl font-bold font-headline">Gururbrahma Services</span>
+        <Link href="/" className="flex items-center gap-3">
+          <Logo className="h-8 w-8 text-accent" />
+          <span className="text-xl font-bold font-headline hidden sm:inline">Gururbrahma Services</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -50,7 +51,7 @@ export function Header() {
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between border-b border-primary-foreground/20 pb-4">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
-                    <Sparkles className="h-6 w-6 text-accent" />
+                    <Logo className="h-6 w-6 text-accent" />
                     <span className="text-lg font-bold font-headline">Gururbrahma</span>
                   </Link>
                   <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
