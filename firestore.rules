@@ -1,0 +1,174 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * Core Philosophy: This ruleset enforces a Role-Based Access Control (RBAC) model.
+     * Public content (posts, videos, services) is readable by anyone, but all
+     * write operations (create, update, delete) are strictly limited to users
+     * with an 'admin' role defined in their user document.
+     *
+     * Data Structure: A flat hierarchy with top-level collections for different
+     * content types (/users, /posts, /videos, /services, /inquiries).
+     *
+     * Key Security Decisions:
+     * - Admin-Only Writes: All content creation and modification is gated by an
+     *   admin role check, which involves a `get` call to the user's profile.
+     * - Public Read-Access: Core content collections are publicly readable to
+     *   serve the website to all visitors, including those not signed in.
+     * - No User Listing: The `/users` collection cannot be listed to prevent
+     *   user enumeration and protect user privacy.
+     * - Inquiry Submissions: Anyone can submit an inquiry to the `/inquiries`
+     *   collection, but only admins can read or manage these submissions.
+     *
+     * Denormalization for Authorization: The authorization model relies on the
+     * `role` field being denormalized directly onto each document in the `/users`
+     * collection. This allows a single `get(/databases/$(database)/documents/users/$(request.auth.uid))`
+     * to determine if a user has admin privileges for any operation across the database.
+     *
+     * Structural Segregation: Each primary data type (User, Post, Video, etc.)
+     * is stored in its own top-level collection. This segregation simplifies rules
+     * by preventing the need to filter mixed content and improves query performance.
+     */
+
+    // ------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the requesting user's UID matches the document's userId.
+     * Ensures a user is acting on their own resources.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the user has an 'admin' role in their user document.
+     * This is the primary gate for all administrative write operations.
+     */
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    /**
+     * Checks if a document exists before an update or delete operation.
+     * Prevents writes to non-existent documents.
+     */
+    function isExistingDoc() {
+      return resource != null;
+    }
+
+    /**
+     * Combines an admin check with an existence check for secure updates/deletes.
+     */
+    function canAdminWriteExisting() {
+      return isAdmin() && isExistingDoc();
+    }
+    
+    /**
+     * Validates that a user creating their own document sets the ID correctly
+     * and does not grant themselves the admin role.
+     */
+    function canCreateOwnUserDoc(userId) {
+      let isCreatingOwnPath = isOwner(userId);
+      let isIdConsistent = request.resource.data.id == userId;
+      let isNotSelfPromoting = request.resource.data.role != 'admin';
+      return isCreatingOwnPath && isIdConsistent && isNotSelfPromoting;
+    }
+    
+    /**
+     * Validates that the user ID field is not changed on update.
+     */
+    function isUserIdImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    // ------------------------------------------------------------------
+    // Collection Rules
+    // ------------------------------------------------------------------
+
+    /**
+     * @description Controls access to user profile documents, which store roles.
+     * @path /users/{userId}
+     * @allow (get) An authenticated user reading their own document.
+     * @deny (list) Any user attempting to list all user documents.
+     * @principle Prevents user enumeration and allows self-read of roles.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if false;
+      allow create: if canCreateOwnUserDoc(userId);
+      allow update: if (isAdmin() && isExistingDoc() && isUserIdImmutable());
+      allow delete: if canAdminWriteExisting();
+    }
+
+    /**
+     * @description Controls access to public blog posts.
+     * @path /posts/{postId}
+     * @allow (get) Any user, signed in or not, reading a blog post.
+     * @deny (create) A non-admin user trying to create a post.
+     * @principle Public read access with admin-only write control.
+     */
+    match /posts/{postId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin();
+      allow update: if canAdminWriteExisting();
+      allow delete: if canAdminWriteExisting();
+    }
+
+    /**
+     * @description Controls access to public video entries.
+     * @path /videos/{videoId}
+     * @allow (list) Any user, signed in or not, listing all videos.
+     * @deny (update) An authenticated, non-admin user trying to change a video URL.
+     * @principle Public read access with admin-only write control.
+     */
+    match /videos/{videoId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin();
+      allow update: if canAdminWriteExisting();
+      allow delete: if canAdminWriteExisting();
+    }
+
+    /**
+     * @description Controls access to public service listings.
+     * @path /services/{serviceId}
+     * @allow (get) Any anonymous user reading service details.
+     * @deny (delete) An admin trying to delete a service that does not exist.
+     * @principle Public read access with admin-only write control.
+     */
+    match /services/{serviceId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isAdmin();
+      allow update: if canAdminWriteExisting();
+      allow delete: if canAdminWriteExisting();
+    }
+
+    /**
+     * @description Controls access to service inquiries submitted by users.
+     * @path /inquiries/{inquiryId}
+     * @allow (create) Any user, signed in or not, submitting a new inquiry.
+     * @deny (get) A regular user trying to read another user's inquiry.
+     * @principle Allows public submission (write-only) while making submitted data private and readable only by admins.
+     */
+    match /inquiries/{inquiryId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if true;
+      allow update: if canAdminWriteExisting();
+      allow delete: if canAdminWriteExisting();
+    }
+  }
+}

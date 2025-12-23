@@ -1,0 +1,294 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account, primarily for admin access.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "User's role (e.g., 'admin').",
+          "format": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "role"
+      ]
+    },
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Represents a blog post.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the post.",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the blog post."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the blog post (rich text)."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the header image for the post.",
+          "format": "uri"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the post was created.",
+          "format": "date-time"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags associated with the post.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "imageUrl",
+        "timestamp",
+        "tags"
+      ]
+    },
+    "Video": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Video",
+      "type": "object",
+      "description": "Represents a YouTube video.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the video.",
+          "format": "uuid"
+        },
+        "youtubeUrl": {
+          "type": "string",
+          "description": "URL of the YouTube video."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the video."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of video ('short' or 'video')."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the video was added.",
+          "format": "date-time"
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "URL of the video's thumbnail.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "youtubeUrl",
+        "title",
+        "type",
+        "timestamp"
+      ]
+    },
+    "Service": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Service",
+      "type": "object",
+      "description": "Represents a service offered.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the service.",
+          "format": "uuid"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the service."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the service."
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of the service."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the service."
+        },
+        "detailedHtml": {
+          "type": "string",
+          "description": "Detailed HTML content for the service description."
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "name",
+        "description",
+        "price",
+        "detailedHtml"
+      ]
+    },
+    "Inquiry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Inquiry",
+      "type": "object",
+      "description": "Represents a service inquiry from a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the inquiry.",
+          "format": "uuid"
+        },
+        "serviceName": {
+          "type": "string",
+          "description": "Name of the service requested."
+        },
+        "userName": {
+          "type": "string",
+          "description": "Name of the user submitting the inquiry."
+        },
+        "contact": {
+          "type": "string",
+          "description": "Contact information of the user (e.g., phone number, email)."
+        },
+        "dateRequested": {
+          "type": "string",
+          "description": "Date the service was requested.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the inquiry ('new' or 'contacted')."
+        }
+      },
+      "required": [
+        "id",
+        "serviceName",
+        "userName",
+        "contact",
+        "dateRequested",
+        "status"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores admin user accounts. Access controlled based on user ID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Stores blog posts with title, content, image URL, timestamp, and tags.",
+          "params": [
+            {
+              "name": "postId",
+              "description": "The unique identifier for the post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/videos/{videoId}",
+        "definition": {
+          "entityName": "Video",
+          "schema": {
+            "$ref": "#/backend/entities/Video"
+          },
+          "description": "Stores video metadata, including YouTube URL, title, type, and timestamp.",
+          "params": [
+            {
+              "name": "videoId",
+              "description": "The unique identifier for the video."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/services/{serviceId}",
+        "definition": {
+          "entityName": "Service",
+          "schema": {
+            "$ref": "#/backend/entities/Service"
+          },
+          "description": "Stores service details, including category, name, description, price, and detailed HTML content.",
+          "params": [
+            {
+              "name": "serviceId",
+              "description": "The unique identifier for the service."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/inquiries/{inquiryId}",
+        "definition": {
+          "entityName": "Inquiry",
+          "schema": {
+            "$ref": "#/backend/entities/Inquiry"
+          },
+          "description": "Stores service inquiries from users, including service name, user name, contact, date requested, and status.",
+          "params": [
+            {
+              "name": "inquiryId",
+              "description": "The unique identifier for the inquiry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the Gururbrahma Services website, focusing on admin authentication, blog post and video management, service inquiries, and a notification ticker. The design prioritizes security, scalability, and ease of debugging. To achieve Authorization Independence, the `users` collection is segregated for storing admin user roles.  The structure supports QAPs through collection segregation (e.g., separating posts and services) and leverages path-based ownership for inquiries."
+  }
+}
