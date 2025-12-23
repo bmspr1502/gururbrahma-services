@@ -1,16 +1,14 @@
-import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 1024 1024"
-      className={cn("text-current", className)}
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g>
-        <path d="M341.333 469.333c0-46.933 46.933-93.867 93.867-93.867s93.867 46.933 93.867 93.867-46.933 93.867-93.867 93.867-93.867-46.933-93.867-93.867zM896 512c0 221.867-162.133 405.333-375.467 426.667l-85.333-213.333c93.867-21.333 170.667-106.667 170.667-213.333s-76.8-192-170.667-213.333l85.333-213.333c213.333 21.333 375.467 204.8 375.467 426.667zM256 512c0 106.667 76.8 192 170.667 213.333l-85.333 213.333c-213.333-21.333-375.467-204.8-375.467-426.667s162.133-405.333 375.467-426.667l85.333 213.333c-93.867 21.333-170.667 106.667-170.667 213.333z" />
-      </g>
-    </svg>
+    <Image
+      src="https://placehold.co/64x64/FBBF24/854D0E?text=L"
+      alt="Gururbrahma Services Logo"
+      width={32}
+      height={32}
+      className={cn('rounded-full', className)}
+    />
   );
 }
