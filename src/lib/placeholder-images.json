@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-priest",
+      "description": "A priest performing a ritual in a warm, inviting setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1646208505943-1a7ed7a62c1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxpbmRpYW4lMjBwcmllc3R8ZW58MHx8fHwxNzY2NDk5NzIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian priest"
+    },
+    {
+      "id": "service-sudarshana-homam",
+      "description": "Depiction of Sudarshana Homam ritual.",
+      "imageUrl": "https://images.unsplash.com/photo-1762929968274-a5dff4fd75ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxoaW5kdSUyMGZpcmUlMjByaXR1YWx8ZW58MHx8fHwxNzY2NDk5NzIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hindu fire ritual"
+    },
+    {
+      "id": "service-ganapathi-homam",
+      "description": "Depiction of Ganapathi Homam ritual.",
+      "imageUrl": "https://images.unsplash.com/photo-1753544745540-c3962284cbbc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsb3JkJTIwZ2FuZXNoYSUyMHdvcnNoaXB8ZW58MHx8fHwxNzY2NDk5NzIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lord ganesha worship"
+    },
+    {
+      "id": "service-graha-pravesham",
+      "description": "Housewarming ceremony.",
+      "imageUrl": "https://images.unsplash.com/photo-1636979277069-8724b9c161b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxpbmRpYW4lMjBob3VzZXdhcm1pbmd8ZW58MHx8fHwxNzY2NDk5NzIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian housewarming"
+    },
+    {
+      "id": "service-kalyanam",
+      "description": "Indian wedding ceremony.",
+      "imageUrl": "https://images.unsplash.com/photo-1542042161784-26ab9e041e89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjB3ZWRkaW5nfGVufDB8fHx8MTc2NjQ5OTcyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian wedding"
+    },
+    {
+      "id": "service-jadhagam-analysis",
+      "description": "Astrology chart analysis.",
+      "imageUrl": "https://images.unsplash.com/photo-1617086286680-12fa90d99f48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhc3Ryb2xvZ3klMjBjaGFydHxlbnwwfHx8fDE3NjY0ODM5NTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "astrology chart"
+    },
+    {
+      "id": "service-compatibility-check",
+      "description": "Marriage compatibility check.",
+      "imageUrl": "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3ZWRkaW5nJTIwcmluZ3N8ZW58MHx8fHwxNzY2NDU5ODEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wedding rings"
+    },
+    {
+      "id": "service-general-advice",
+      "description": "Astrological consultation.",
+      "imageUrl": "https://images.unsplash.com/photo-1651010303993-4c48fcc16c94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29uc3RlbGxhdGlvbiUyMHN0YXJzfGVufDB8fHx8MTc2NjQ5OTcyMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "constellation stars"
+    },
+    {
+      "id": "service-matrimony-assistance",
+      "description": "Sourashtra matrimony assistance.",
+      "imageUrl": "https://images.unsplash.com/photo-1567122087721-47b09b61e1d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxpbmRpYW4lMjBmYW1pbHl8ZW58MHx8fHwxNzY2NDk5NzIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian family"
+    },
+    {
+      "id": "post-1",
+      "description": "Blog post image about festivals.",
+      "imageUrl": "https://images.unsplash.com/photo-1567582134958-7effe4fe06e8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxpbmRpYW4lMjBmZXN0aXZhbHxlbnwwfHx8fDE3NjY0OTk3MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian festival"
+    },
+    {
+      "id": "post-2",
+      "description": "Blog post image about astrology.",
+      "imageUrl": "https://images.unsplash.com/photo-1636974073788-2aa642ac79a9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx6b2RpYWMlMjBzaWduc3xlbnwwfHx8fDE3NjY0OTk3MjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "zodiac signs"
+    },
+    {
+      "id": "priest-bio",
+      "description": "A profile photo of the priest.",
+      "imageUrl": "https://images.unsplash.com/photo-1661870832676-c580197bc5b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxpbmRpYW4lMjBtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjY0MjE2MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "indian man portrait"
+    }
+  ]
 }
