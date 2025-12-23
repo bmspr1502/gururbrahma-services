@@ -1,61 +1,43 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useFormState } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-// import { login } from './actions'; // This will be created later
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { login } from './actions';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-});
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full !mt-6" disabled={pending}>
+      {pending ? 'Signing In...' : 'Sign In'}
+    </Button>
+  );
+}
 
 export function AdminLoginForm() {
+  const [state, formAction] = useFormState(login, undefined);
   const { toast } = useToast();
-  
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
-    // const error = await login(values);
-    // if (error) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Login Failed",
-    //     description: error,
-    //   });
-    // } else {
+  useEffect(() => {
+    if (state?.error) {
       toast({
-        title: "Login Successful",
-        description: "Redirecting to dashboard...",
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: state.error,
       });
-      // You would redirect to the admin dashboard here, e.g., router.push('/admin/dashboard')
-    // }
-    console.log("Admin Login Submitted", values);
-  }
+    }
+  }, [state, toast]);
 
   return (
     <Card className="shadow-2xl">
@@ -66,47 +48,29 @@ export function AdminLoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
+        <form action={formAction} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="admin@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              type="email"
+              placeholder="admin@example.com"
+              required
             />
-            <FormField
-              control={form.control}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
               name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              type="password"
+              placeholder="••••••••"
+              required
             />
-            <Button
-              type="submit"
-              className="w-full !mt-6"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
-        </Form>
+          </div>
+          <SubmitButton />
+        </form>
       </CardContent>
     </Card>
   );
