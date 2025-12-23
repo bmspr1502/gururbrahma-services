@@ -49,8 +49,18 @@ export interface UserHookResult { // Renamed from UserAuthHookResult for consist
   userError: Error | null;
 }
 
+const INITIAL_CONTEXT_STATE: FirebaseContextState = {
+  areServicesAvailable: false,
+  firebaseApp: null,
+  firestore: null,
+  auth: null,
+  user: null,
+  isUserLoading: true,
+  userError: null,
+};
+
 // React Context
-export const FirebaseContext = createContext<FirebaseContextState | undefined>(undefined);
+export const FirebaseContext = createContext<FirebaseContextState>(INITIAL_CONTEXT_STATE);
 
 /**
  * FirebaseProvider manages and provides Firebase services and user authentication state.
@@ -118,12 +128,21 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 export const useFirebase = (): FirebaseServicesAndUser => {
   const context = useContext(FirebaseContext);
 
-  if (context === undefined) {
-    throw new Error('useFirebase must be used within a FirebaseProvider.');
-  }
-
-  if (!context.areServicesAvailable || !context.firebaseApp || !context.firestore || !context.auth) {
-    throw new Error('Firebase core services not available. Check FirebaseProvider props.');
+  if (!context?.areServicesAvailable || !context?.firebaseApp || !context?.firestore || !context?.auth) {
+    // If we're on the client and services are missing, it's a provider error
+    if (typeof window !== 'undefined' && !context?.areServicesAvailable) {
+       throw new Error('Firebase core services not available. Check FirebaseProvider props.');
+    }
+    
+    // On the server (SSR), return placeholder to prevent crashes
+    return {
+      firebaseApp: context?.firebaseApp || {} as any,
+      firestore: context?.firestore || {} as any,
+      auth: context?.auth || {} as any,
+      user: context?.user || null,
+      isUserLoading: context?.isUserLoading ?? true,
+      userError: context?.userError || null,
+    };
   }
 
   return {

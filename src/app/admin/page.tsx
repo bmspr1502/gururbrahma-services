@@ -7,14 +7,20 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
   const idToken = cookieStore.get('idToken')?.value;
   let user = null;
 
-  if (idToken) {
+  if (session) {
+    try {
+      user = await auth.verifySessionCookie(session, true);
+    } catch (error) {
+      user = null;
+    }
+  } else if (idToken) {
     try {
       user = await auth.verifyIdToken(idToken);
     } catch (error) {
-      // Invalid token, treat as logged out
       user = null;
     }
   }

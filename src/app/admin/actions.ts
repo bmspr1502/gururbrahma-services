@@ -1,14 +1,11 @@
 "use server";
 
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  getAuth,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { initializeApp, getApps } from "firebase/app";
 import { firebaseConfig } from "@/firebase/config";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { auth as adminAuth } from "@/firebase/server";
 
 // Initialize Client SDK on the server for login purposes
 const app =
@@ -26,35 +23,35 @@ export async function login(prevState: any, formData: FormData) {
       password
     );
     const idToken = await userCredential.user.getIdToken();
-    (await cookies()).set("idToken", idToken, { secure: true, httpOnly: true });
+
+    // Create a session cookie
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+      expiresIn,
+    });
+
+    (await cookies()).set("session", sessionCookie, {
+      maxAge: expiresIn,
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+    });
+
+    // Clean up old idToken cookie if it exists
+    (await cookies()).delete("idToken");
+
     revalidatePath("/admin");
   } catch (error: any) {
     console.error("Login Error:", error);
-    if (error.code === "auth/user-not-found") {
-      // For simplicity, we'll create the user if they don't exist.
-      // In a real app, you might want to handle this differently.
-      try {
-        const newUserCredential = await createUserWithEmailAndPassword(
-          clientAuth,
-          email,
-          password
-        );
-        const idToken = await newUserCredential.user.getIdToken();
-        (await cookies()).set("idToken", idToken, {
-          secure: true,
-          httpOnly: true,
-        });
-        revalidatePath("/admin");
-      } catch (createError: any) {
-        return { error: createError.message };
-      }
-    } else {
-      return { error: error.message };
-    }
+    return {
+      error:
+        "Log in failed. Please check your credentials or contact the owner for access.",
+    };
   }
 }
 
 export async function logout() {
+  (await cookies()).delete("session");
   (await cookies()).delete("idToken");
   revalidatePath("/admin");
 }

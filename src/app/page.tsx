@@ -5,11 +5,44 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/post-card";
 import { VideoCard } from "@/components/video-card";
-import { latestPosts, latestVideos } from "@/lib/data";
+import { db } from "@/firebase/server";
+import { Post, Video } from "@/lib/types";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { serializeFirestoreData } from "@/lib/utils";
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === "hero-priest")!;
+
+  // Fetch data from Firestore
+  let notification: any = null;
+  let posts: Post[] = [];
+  let videos: Video[] = [];
+
+  try {
+    const [notifyDoc, postsSnap, videosSnap] = await Promise.all([
+      db.collection("site-content").doc("home-notification").get(),
+      db.collection("posts").orderBy("createdAt", "desc").limit(2).get(),
+      db.collection("videos").orderBy("createdAt", "desc").limit(2).get(),
+    ]);
+
+    if (notifyDoc.exists && notifyDoc.data()?.active) {
+      notification = serializeFirestoreData(notifyDoc.data());
+    }
+
+    posts = postsSnap.docs.map((doc: any) => {
+      const data = serializeFirestoreData(doc.data());
+      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Post;
+    });
+    videos = videosSnap.docs.map((doc: any) => {
+      const data = serializeFirestoreData(doc.data());
+      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Video;
+    });
+
+  } catch (error) {
+    console.error("Error fetching homepage data:", error);
+  }
 
   return (
     <div className="flex flex-col">
@@ -38,15 +71,17 @@ export default function Home() {
       </section>
 
       {/* Notification Ticker */}
-      <div className="container mx-auto py-4 px-4">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Upcoming Event!</AlertTitle>
-          <AlertDescription>
-            Special pujas available for the upcoming Lunar Eclipse. Timings will be updated soon.
-          </AlertDescription>
-        </Alert>
-      </div>
+      {notification && (
+        <div className="container mx-auto py-4 px-4">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{notification.title}</AlertTitle>
+            <AlertDescription>
+              {notification.message}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       <div className="container mx-auto px-4 py-12">
         {/* Latest Updates Section */}
@@ -60,9 +95,13 @@ export default function Home() {
                 <h2 className="text-3xl font-bold">Latest Videos</h2>
               </div>
               <div className="space-y-6">
-                {latestVideos.map((video) => (
-                  <VideoCard key={video.id} video={video} />
-                ))}
+                {videos.length > 0 ? (
+                  videos.map((video) => (
+                    <VideoCard key={video.id} video={video} />
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">Stay tuned for new videos.</p>
+                )}
               </div>
             </div>
 
@@ -73,9 +112,13 @@ export default function Home() {
                 <h2 className="text-3xl font-bold">Recent Articles</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {latestPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
+                {posts.length > 0 ? (
+                  posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">New articles coming soon.</p>
+                )}
               </div>
             </div>
           </div>

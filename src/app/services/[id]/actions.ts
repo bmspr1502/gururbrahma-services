@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { db } from "@/firebase/server";
 
 export const FormSchema = z.object({
   serviceId: z.string(),
@@ -27,27 +28,17 @@ export async function requestServiceAction(
   }
 
   try {
-    // In a real application, you would do the following:
-    // 1. Save the inquiry to the Firestore 'inquiries' collection.
-    //    const db = getFirestore();
-    //    await addDoc(collection(db, "inquiries"), {
-    //      ...validationResult.data,
-    //      status: 'new',
-    //      dateRequested: new Date(),
-    //    });
+    const inquiryData = {
+      ...validationResult.data,
+      status: "new",
+      createdAt: new Date(),
+    };
 
-    // 2. Trigger an email notification to the admin.
-    //    This could be a call to an Express route with nodemailer,
-    //    or using a Firebase Extension like "Trigger Email".
+    await db.collection("inquiries").add(inquiryData);
 
-    console.log("New Service Inquiry Received:");
-    console.log(validationResult.data);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log("New Service Inquiry Saved to Firestore:", inquiryData);
 
     return { success: true };
-    
   } catch (error) {
     console.error("Error processing service request:", error);
     return { success: false, message: "An unexpected error occurred." };

@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { BackgroundPattern } from '@/components/background-pattern';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
   title: 'Gururbrahma Services | Guiding Your Spiritual Journey',
@@ -42,13 +43,15 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased min-h-screen flex flex-col')}>
-        <BackgroundPattern />
-        <Header />
-        <div className="flex-grow pt-16">
-          {children}
-        </div>
-        <Footer />
-        <Toaster />
+        <FirebaseClientProvider>
+          <BackgroundPattern />
+          <Header />
+          <div className="flex-grow pt-16">
+            {children}
+          </div>
+          <Footer />
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );
