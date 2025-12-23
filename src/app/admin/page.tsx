@@ -3,8 +3,11 @@ import { redirect } from 'next/navigation';
 import { AdminLoginForm } from './login-form';
 import { auth } from '@/firebase/server';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
-  const idToken = cookies().get('idToken')?.value;
+  const cookieStore = await cookies();
+  const idToken = cookieStore.get('idToken')?.value;
   let user = null;
 
   if (idToken) {

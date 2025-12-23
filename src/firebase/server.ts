@@ -1,17 +1,34 @@
-import { initializeApp, getApp, getApps, cert } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getServiceAccount } from './service-account';
+import { initializeApp, getApp, getApps, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
+import { getServiceAccount } from "./service-account";
 
-const apps = getApps();
+const serviceAccount = getServiceAccount();
 
-if (!apps.length) {
+if (serviceAccount && !getApps().length) {
   initializeApp({
-    credential: cert(getServiceAccount()),
+    credential: cert(serviceAccount),
   });
 }
 
-const adminApp = getApp();
+const adminApp = getApps().length > 0 ? getApp() : null;
 
-export const auth = getAuth(adminApp);
-export const db = getFirestore(adminApp);
+export const auth = adminApp
+  ? getAuth(adminApp)
+  : ({
+      verifyIdToken: async () => {
+        throw new Error(
+          "Firebase Admin SDK not initialized: missing credentials"
+        );
+      },
+    } as any);
+
+export const db = adminApp
+  ? getFirestore(adminApp)
+  : ({
+      collection: () => {
+        throw new Error(
+          "Firebase Admin SDK not initialized: missing credentials"
+        );
+      },
+    } as any);

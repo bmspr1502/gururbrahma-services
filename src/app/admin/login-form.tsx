@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { login } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
+import { Logo } from '@/components/logo';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -42,6 +43,9 @@ export function AdminLoginForm() {
   return (
     <Card className="shadow-2xl">
       <CardHeader className="text-center">
+        <div className="flex justify-center mb-4">
+          <Logo className="w-16 h-16" />
+        </div>
         <CardTitle className="text-2xl">Admin Portal</CardTitle>
         <CardDescription>
           Please sign in to manage the website content.

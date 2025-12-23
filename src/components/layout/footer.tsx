@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Youtube, Facebook, Instagram } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 const OmSymbol = () => (
   <svg
@@ -19,7 +20,10 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="font-headline text-lg font-bold mb-4">Gururbrahma Services</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <Logo className="h-8 w-8" />
+              <h3 className="font-headline text-lg font-bold">Gururbrahma Services</h3>
+            </div>
             <p className="text-sm text-primary-foreground/80">
               Guiding your spiritual journey through Vedic traditions.
             </p>

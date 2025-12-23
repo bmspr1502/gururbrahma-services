@@ -13,15 +13,19 @@ export const metadata: Metadata = {
     title: 'Gururbrahma Services',
     description: 'Guiding your spiritual journey through Vedic traditions.',
     type: 'website',
-    url: 'https://gururbrahma-services.com', // Replace with actual URL
+    url: 'https://gururbrahma-services.com',
     images: [
       {
-        url: 'https://gururbrahma-services.com/og-image.jpg', // Replace with actual image URL
+        url: '/logo.png',
         width: 1200,
-        height: 630,
-        alt: 'Gururbrahma Services',
+        height: 1200,
+        alt: 'Gururbrahma Services Logo',
       },
     ],
+  },
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
 };
 
