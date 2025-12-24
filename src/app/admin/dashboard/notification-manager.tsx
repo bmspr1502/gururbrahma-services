@@ -7,10 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { updateHomeNotification } from "./actions";
+import { getHomeNotification, updateHomeNotification } from "./actions";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc } from "firebase/firestore";
 
 export function NotificationManager() {
   const { toast } = useToast();
@@ -18,18 +16,21 @@ export function NotificationManager() {
   const [message, setMessage] = useState("");
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const firestore = useFirestore();
-  const notificationRef = useMemoFirebase(() => doc(firestore, "site-content", "home-notification"), [firestore]);
-  const { data: notification, isLoading: fetching } = useDoc(notificationRef);
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
-    if (notification) {
-      setTitle(notification.title || "");
-      setMessage(notification.message || "");
-      setActive(notification.active || false);
+    async function fetchNotification() {
+      const result = await getHomeNotification();
+      if (result.success && result.data) {
+        setTitle(result.data.title || "");
+        setMessage(result.data.message || "");
+        setActive(result.data.active || false);
+      }
+      setFetching(false);
     }
-  }, [notification]);
+    fetchNotification();
+  }, []);
+
 
   const handleSave = async () => {
     setLoading(true);

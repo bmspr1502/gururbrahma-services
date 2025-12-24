@@ -3,6 +3,35 @@
 import { db } from "@/firebase/server";
 import { revalidatePath } from "next/cache";
 
+// Inquiry Actions
+export async function getInquiries() {
+  try {
+    const snapshot = await db
+      .collection("inquiries")
+      .orderBy("createdAt", "desc")
+      .get();
+    const inquiries = snapshot.docs.map((doc: any) => {
+      const data = doc.data();
+      // Manual serialization for simple fields, helper would be better but keeping it self-contained
+      return {
+        id: doc.id,
+        ...data,
+        // Ensure Dates are serializable numbers or ISO strings for client
+        createdAt: data.createdAt?.toDate
+          ? data.createdAt.toDate()
+          : new Date(),
+        preferredDate: data.preferredDate?.toDate
+          ? data.preferredDate.toDate()
+          : null,
+      };
+    });
+    return { success: true, data: inquiries };
+  } catch (error) {
+    console.error("Error fetching inquiries:", error);
+    return { success: false, error: "Failed to fetch inquiries." };
+  }
+}
+
 // Notification Actions
 export async function updateHomeNotification(
   title: string,
@@ -21,6 +50,29 @@ export async function updateHomeNotification(
   } catch (error) {
     console.error("Error updating notification:", error);
     return { success: false, error: "Failed to update notification." };
+  }
+}
+
+export async function getHomeNotification() {
+  try {
+    const doc = await db
+      .collection("site-content")
+      .doc("home-notification")
+      .get();
+    if (doc.exists) {
+      const data = doc.data();
+      return {
+        success: true,
+        data: {
+          ...data,
+          updatedAt: data?.updatedAt?.toDate ? data.updatedAt.toDate() : null,
+        },
+      };
+    }
+    return { success: true, data: null };
+  } catch (error) {
+    console.error("Error fetching notification:", error);
+    return { success: false, error: "Failed to fetch notification settings." };
   }
 }
 

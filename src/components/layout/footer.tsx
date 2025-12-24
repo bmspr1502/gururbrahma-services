@@ -3,20 +3,22 @@ import { Youtube, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { Logo } from '@/components/logo';
 
 const OmSymbol = () => (
+   // ... 
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    className="h-8 w-8 text-primary-foreground/20"
+    className="h-8 w-8 text-white/20"
   >
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 15.5c-1.63 0-3.08-.8-4-2.02l1.41-1.41c.64.84 1.59 1.43 2.59 1.43s2-.59 2-1.5c0-1.2-1.37-1.45-2.73-1.84-2.13-.62-3.27-1.63-3.27-3.57C6 6.13 7.82 4.5 10.5 4.5c1.63 0 3.08.8 4 2.02l-1.41 1.41c-.64-.84-1.59-1.43-2.59-1.43s-2 .59-2 1.5c0 1.2 1.37 1.45 2.73 1.84 2.13.62 3.27 1.63 3.27 3.57C14 16.87 12.18 18.5 9.5 18.5z" />
   </svg>
 );
 
 
-export function Footer() {
+export function Footer({ isAdmin = false }: { isAdmin?: boolean }) {
+  
   return (
-    <footer className="bg-primary text-primary-foreground relative overflow-hidden">
+    <footer className={`relative overflow-hidden transition-colors duration-300 ${isAdmin ? "bg-black text-white" : "bg-primary text-primary-foreground"}`}>
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center lg:items-start">
           {/* Logo and Branding Section - Major Space */}

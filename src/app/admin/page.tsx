@@ -15,12 +15,14 @@ export default async function AdminPage() {
     try {
       user = await auth.verifySessionCookie(session, true);
     } catch (error) {
+      console.error("Session verification failed:", error);
       user = null;
     }
   } else if (idToken) {
     try {
       user = await auth.verifyIdToken(idToken);
     } catch (error) {
+      console.error("ID Token verification failed:", error);
       user = null;
     }
   }

@@ -16,11 +16,11 @@ const navLinks = [
   { name: 'Contact', href: '/contact' },
 ];
 
-export function Header() {
+export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-primary/80 text-primary-foreground backdrop-blur-lg shadow-md">
+    <header className={`fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-lg shadow-md transition-colors duration-300 ${isAdmin ? "bg-black" : "bg-primary/80"}`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-3">
           <Logo className="h-8 w-8 text-accent" />
@@ -34,6 +34,11 @@ export function Header() {
               {link.name}
             </Link>
           ))}
+          {isAdmin && (
+            <Link href="/admin/dashboard" className="text-sm font-medium transition-colors hover:text-accent text-accent">
+              Admin
+            </Link>
+          )}
           <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/services">Book Now</Link>
           </Button>

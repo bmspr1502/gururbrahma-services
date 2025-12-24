@@ -1,16 +1,26 @@
 "use client";
 
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { getInquiries } from "./actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { User, Phone, Calendar as CalendarIcon, Hash } from "lucide-react";
 
 export function InquiryList() {
-  const firestore = useFirestore();
-  const inquiriesQuery = useMemoFirebase(() => query(collection(firestore, "inquiries"), orderBy("createdAt", "desc")), [firestore]);
-  const { data: inquiries, isLoading: fetching } = useCollection(inquiriesQuery);
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchInquiries() {
+      const result = await getInquiries();
+      if (result.success && result.data) {
+        setInquiries(result.data);
+      }
+      setLoading(false);
+    }
+    fetchInquiries();
+  }, []);
 
   return (
     <Card className="border-primary/20">
@@ -19,7 +29,7 @@ export function InquiryList() {
         <CardDescription>Recent requests submitted by users through the services page.</CardDescription>
       </CardHeader>
       <CardContent>
-        {fetching ? (
+        {loading ? (
           <div className="text-center py-8">Loading inquiries...</div>
         ) : inquiries?.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">No inquiries received yet.</div>
@@ -35,7 +45,7 @@ export function InquiryList() {
                           {inquiry.serviceName}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
-                          {inquiry.createdAt?.toDate ? format(inquiry.createdAt.toDate(), "PPP p") : "Just now"}
+                          {inquiry.createdAt ? format(new Date(inquiry.createdAt), "PPP p") : "Just now"}
                         </span>
                       </div>
                       
@@ -50,7 +60,7 @@ export function InquiryList() {
                         </div>
                         <div className="flex items-center gap-2 text-sm text-accent font-medium">
                           <CalendarIcon className="w-4 h-4" />
-                          <span>Pref. Date: {inquiry.preferredDate?.toDate ? format(inquiry.preferredDate.toDate(), "PPP") : "N/A"}</span>
+                          <span>Pref. Date: {inquiry.preferredDate ? format(new Date(inquiry.preferredDate), "PPP") : "N/A"}</span>
                         </div>
                         {inquiry.rashiNakshatra && (
                           <div className="flex items-center gap-2 text-sm">

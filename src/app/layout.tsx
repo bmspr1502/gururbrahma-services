@@ -31,11 +31,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { cookies } from 'next/headers';
+import { auth } from '@/firebase/server';
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Server-side check for admin status
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  let isAdmin = false;
+
+  if (session) {
+    try {
+      // Optimistic check: if session exists, assume admin for UI speed, 
+      // or verify properly. Verification is safer.
+      const decodedClaims = await auth.verifySessionCookie(session, true);
+      if (decodedClaims) {
+        isAdmin = true;
+      }
+    } catch (error) {
+       // invalid session
+       isAdmin = false;
+    }
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -46,11 +68,11 @@ export default function RootLayout({
       <body className={cn('font-body antialiased min-h-screen flex flex-col')}>
         <FirebaseClientProvider>
           <BackgroundPattern />
-          <Header />
+          <Header isAdmin={isAdmin} />
           <div className="flex-grow pt-16">
             {children}
           </div>
-          <Footer />
+          <Footer isAdmin={isAdmin} />
           <Toaster />
         </FirebaseClientProvider>
       </body>

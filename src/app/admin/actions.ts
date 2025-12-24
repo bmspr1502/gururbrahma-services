@@ -5,6 +5,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { firebaseConfig } from "@/firebase/config";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { auth as adminAuth } from "@/firebase/server";
 
 // Initialize Client SDK on the server for login purposes
@@ -48,6 +49,9 @@ export async function login(prevState: any, formData: FormData) {
         "Log in failed. Please check your credentials or contact the owner for access.",
     };
   }
+
+  // Redirect outside try-catch to avoid next.js redirect error being caught
+  redirect("/admin/dashboard");
 }
 
 export async function logout() {
