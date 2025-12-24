@@ -23,8 +23,8 @@ export default async function Home() {
   try {
     const [notifyDoc, postsSnap, videosSnap] = await Promise.all([
       db.collection("site-content").doc("home-notification").get(),
-      db.collection("posts").orderBy("createdAt", "desc").limit(2).get(),
-      db.collection("videos").orderBy("createdAt", "desc").limit(2).get(),
+      db.collection("posts").orderBy("timestamp", "desc").limit(2).get(),
+      db.collection("videos").orderBy("timestamp", "desc").limit(2).get(),
     ]);
 
     if (notifyDoc.exists && notifyDoc.data()?.active) {
@@ -33,11 +33,11 @@ export default async function Home() {
 
     posts = postsSnap.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
-      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Post;
+      return { id: doc.id, ...data } as Post;
     });
     videos = videosSnap.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
-      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Video;
+      return { id: doc.id, ...data } as Video;
     });
 
   } catch (error) {

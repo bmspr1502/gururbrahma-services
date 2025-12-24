@@ -10,10 +10,10 @@ export default async function PostsPage() {
   let posts: Post[] = [];
 
   try {
-    const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
+    const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
     posts = snapshot.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
-      return { id: doc.id, ...data, timestamp: data.createdAt || new Date() } as Post;
+      return { id: doc.id, ...data } as Post;
     });
   } catch (error) {
     console.error("Error fetching posts:", error);

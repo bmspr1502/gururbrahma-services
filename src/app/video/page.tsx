@@ -11,10 +11,10 @@ export default async function VideosPage() {
   let videos: Video[] = [];
   
   try {
-    const snapshot = await db.collection('videos').orderBy('createdAt', 'desc').get();
+    const snapshot = await db.collection('videos').orderBy('timestamp', 'desc').get();
     videos = snapshot.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
-      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Video;
+      return { id: doc.id, ...data } as Video;
     });
   } catch (error) {
     console.error("Error fetching videos:", error);

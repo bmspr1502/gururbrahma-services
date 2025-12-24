@@ -22,7 +22,7 @@ export function PostManager() {
   const [loading, setLoading] = useState(false);
 
   const firestore = useFirestore();
-  const postsQuery = useMemoFirebase(() => query(collection(firestore, "posts"), orderBy("createdAt", "desc")), [firestore]);
+  const postsQuery = useMemoFirebase(() => query(collection(firestore, "posts"), orderBy("timestamp", "desc")), [firestore]);
   const { data: posts, isLoading: fetching } = useCollection(postsQuery);
 
   const handleAdd = async () => {

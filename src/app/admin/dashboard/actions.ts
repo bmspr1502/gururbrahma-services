@@ -87,7 +87,7 @@ export async function addVideo(
       youtubeUrl,
       title,
       type,
-      createdAt: new Date(),
+      timestamp: new Date(),
     });
     revalidatePath("/video");
     revalidatePath("/");
@@ -123,7 +123,7 @@ export async function addPost(
       content,
       tags,
       imageUrl,
-      createdAt: new Date(),
+      timestamp: new Date(),
     });
     revalidatePath("/posts");
     revalidatePath("/");
