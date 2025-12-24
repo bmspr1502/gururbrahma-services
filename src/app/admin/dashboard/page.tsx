@@ -8,7 +8,7 @@ import { DashboardTabs } from './tabs';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
 
   if (!session) {
@@ -30,16 +30,27 @@ export default async function AdminDashboardPage() {
   // Stricter role check for production
   try {
     const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
+    const isSuperAdmin = decodedToken.email === 'drbmsathyaramacharya@gmail.com';
+    const isAdmin = userDoc.exists && userDoc.data()?.role === 'admin';
+
+    if (!isSuperAdmin && !isAdmin) {
       console.warn(`User ${decodedToken.email} attempted admin access without required role or user document.`);
-      // Invalidate the session and redirect
-      cookies().delete("session");
-      return redirect('/admin');
+      // Invalidate the session via API route and redirect
+      return redirect('/api/auth/logout');
+    }
+
+    // Auto-fix super admin role if missing
+    if (isSuperAdmin && !isAdmin) {
+       await db.collection('users').doc(decodedToken.uid).set({ 
+         email: decodedToken.email,
+         role: 'admin',
+         createdAt: new Date()
+       }, { merge: true });
     }
   } catch (error) {
     console.error('Error verifying admin role from Firestore:', error);
     // On any Firestore error, deny access as a security precaution.
-    return redirect('/admin');
+    return redirect('/api/auth/logout');
   }
 
 
