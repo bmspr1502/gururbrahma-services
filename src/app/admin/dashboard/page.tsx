@@ -27,24 +27,21 @@ export default async function AdminDashboardPage() {
     return redirect('/admin');
   }
 
-  // Role check
+  // Stricter role check for production
   try {
     const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-    const userData = userDoc.data();
-    
-    // For now, if the user doesn't exist in the users collection, we'll allow it 
-    // but log a warning, OR we can be strict. Let's be semi-strict: 
-    // If the doc exists, it MUST have role === 'admin'.
-    if (userDoc.exists && userData?.role !== 'admin') {
-      console.warn(`User ${decodedToken.email} attempted admin access without admin role.`);
+    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
+      console.warn(`User ${decodedToken.email} attempted admin access without required role or user document.`);
+      // Invalidate the session and redirect
+      cookies().delete("session");
       return redirect('/admin');
     }
-    
   } catch (error) {
-    console.error('Error verifying admin role:', error);
-    // On Firestore error, redirect to login to prevent unauthorized access.
+    console.error('Error verifying admin role from Firestore:', error);
+    // On any Firestore error, deny access as a security precaution.
     return redirect('/admin');
   }
+
 
   return (
     <div className="container mx-auto px-4 py-8">

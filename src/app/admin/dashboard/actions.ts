@@ -8,7 +8,7 @@ export async function getInquiries() {
   try {
     const snapshot = await db
       .collection("inquiries")
-      .orderBy("createdAt", "desc")
+      .orderBy("timestamp", "desc")
       .get();
     const inquiries = snapshot.docs.map((doc: any) => {
       const data = doc.data();
@@ -17,8 +17,8 @@ export async function getInquiries() {
         id: doc.id,
         ...data,
         // Ensure Dates are serializable numbers or ISO strings for client
-        createdAt: data.createdAt?.toDate
-          ? data.createdAt.toDate()
+        timestamp: data.timestamp?.toDate
+          ? data.timestamp.toDate()
           : new Date(),
         preferredDate: data.preferredDate?.toDate
           ? data.preferredDate.toDate()

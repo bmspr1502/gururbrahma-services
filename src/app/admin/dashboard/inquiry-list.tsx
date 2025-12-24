@@ -45,7 +45,7 @@ export function InquiryList() {
                           {inquiry.serviceName}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
-                          {inquiry.createdAt ? format(new Date(inquiry.createdAt), "PPP p") : "Just now"}
+                          {inquiry.timestamp ? format(new Date(inquiry.timestamp), "PPP p") : "Just now"}
                         </span>
                       </div>
                       

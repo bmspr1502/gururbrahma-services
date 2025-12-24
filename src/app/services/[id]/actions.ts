@@ -21,7 +21,7 @@ export async function requestServiceAction(
     const inquiryData = {
       ...validationResult.data,
       status: "new",
-      createdAt: new Date(),
+      timestamp: new Date(),
     };
 
     await db.collection("inquiries").add(inquiryData);

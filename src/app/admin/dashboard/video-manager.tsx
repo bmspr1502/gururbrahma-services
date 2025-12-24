@@ -21,7 +21,7 @@ export function VideoManager() {
   const [loading, setLoading] = useState(false);
 
   const firestore = useFirestore();
-  const videosQuery = useMemoFirebase(() => query(collection(firestore, "videos"), orderBy("createdAt", "desc")), [firestore]);
+  const videosQuery = useMemoFirebase(() => query(collection(firestore, "videos"), orderBy("timestamp", "desc")), [firestore]);
   const { data: videos, isLoading: fetching } = useCollection(videosQuery);
 
   const getYoutubeId = (url: string) => {
