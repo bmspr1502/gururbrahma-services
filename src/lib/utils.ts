@@ -8,6 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export function serializeFirestoreData(data: any): any {
   if (data === null || data === undefined) return data;
 
+  // Handle Dates (already serialized or standard JS Dates)
+  if (data instanceof Date) return data;
+
   // Handle arrays
   if (Array.isArray(data)) {
     return data.map((item) => serializeFirestoreData(item));
@@ -15,7 +18,12 @@ export function serializeFirestoreData(data: any): any {
 
   // Handle objects
   if (typeof data === "object") {
-    // Check for Firestore Timestamp (Admin SDK)
+    // Check for Firestore Timestamp (Standard method for both Admin and Client SDKs)
+    if (typeof data.toDate === "function") {
+      return data.toDate();
+    }
+
+    // Check for Timestamp properties if already plain object
     if ("_seconds" in data && "_nanoseconds" in data) {
       return new Date(data._seconds * 1000);
     }

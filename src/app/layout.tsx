@@ -8,6 +8,7 @@ import { BackgroundPattern } from '@/components/background-pattern';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://gururbrahma-services.com'),
   title: 'Gururbrahma Services | Guiding Your Spiritual Journey',
   description: 'Guiding your spiritual journey through Vedic traditions. Professional priest and astrologer services.',
   openGraph: {

@@ -77,7 +77,9 @@ export function VideoManager() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="video-title">Video Title</Label>
+              <Label htmlFor="video-title" className="flex items-center gap-1">
+                Video Title <span className="text-destructive">*</span>
+              </Label>
               <Input 
                 id="video-title" 
                 placeholder="e.g., Daily Morning Puja" 
@@ -99,7 +101,9 @@ export function VideoManager() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="video-url">YouTube URL</Label>
+            <Label htmlFor="video-url" className="flex items-center gap-1">
+              YouTube URL <span className="text-destructive">*</span>
+            </Label>
             <Input 
               id="video-url" 
               placeholder="https://www.youtube.com/watch?v=..." 

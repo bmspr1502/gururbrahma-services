@@ -1,6 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CalendarIcon } from "lucide-react";
@@ -25,7 +26,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { requestServiceAction, FormSchema } from "./actions";
+import { requestServiceAction } from "./actions";
+import { FormSchema } from "./schema";
 
 type RequestServiceFormProps = {
   serviceId: string;
@@ -34,6 +36,7 @@ type RequestServiceFormProps = {
 
 export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFormProps) {
   const { toast } = useToast();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -42,6 +45,7 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
       serviceName,
       name: "",
       phone: "",
+      preferredDate: undefined,
       rashiNakshatra: "",
     },
   });
@@ -78,7 +82,9 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel className="flex items-center gap-1">
+                    Full Name <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Your full name" {...field} />
                   </FormControl>
@@ -91,7 +97,9 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel className="flex items-center gap-1">
+                    Phone Number <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Your contact number" {...field} />
                   </FormControl>
@@ -104,14 +112,16 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               name="preferredDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Preferred Date</FormLabel>
-                  <Popover>
+                  <FormLabel className="flex items-center gap-1">
+                    Preferred Date <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal border-primary/20 hover:border-primary/50",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -128,10 +138,15 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
                       <Calendar
                         mode="single"
                         selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() || date < new Date("1900-01-01")
-                        }
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setIsCalendarOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today;
+                        }}
                         initialFocus
                       />
                     </PopoverContent>

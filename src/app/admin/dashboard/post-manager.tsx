@@ -76,7 +76,9 @@ export function PostManager() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="post-title">Post Title</Label>
+              <Label htmlFor="post-title" className="flex items-center gap-1">
+                Post Title <span className="text-destructive">*</span>
+              </Label>
               <Input 
                 id="post-title" 
                 placeholder="The Significance of..." 
@@ -94,7 +96,9 @@ export function PostManager() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="post-content">Content (HTML supported)</Label>
+              <Label htmlFor="post-content" className="flex items-center gap-1">
+                Content (HTML supported) <span className="text-destructive">*</span>
+              </Label>
               <Textarea 
                 id="post-content" 
                 placeholder="Write your article here..." 

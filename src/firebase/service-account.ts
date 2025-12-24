@@ -3,11 +3,11 @@ import type { ServiceAccount } from "firebase-admin/app";
 // This function now reads from environment variables
 // to construct the service account object securely.
 export function getServiceAccount(): ServiceAccount | null {
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = process.env.FB_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
   if (
-    !process.env.FIREBASE_PROJECT_ID ||
-    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !process.env.FB_PROJECT_ID ||
+    !process.env.FB_CLIENT_EMAIL ||
     !privateKey
   ) {
     console.warn(
@@ -17,8 +17,8 @@ export function getServiceAccount(): ServiceAccount | null {
   }
 
   return {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    projectId: process.env.FB_PROJECT_ID,
+    clientEmail: process.env.FB_CLIENT_EMAIL,
     privateKey: privateKey,
   };
 }
