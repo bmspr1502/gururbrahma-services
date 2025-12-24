@@ -31,7 +31,7 @@ export async function login(prevState: any, formData: FormData) {
       expiresIn,
     });
 
-    (await cookies()).set("session", sessionCookie, {
+    cookies().set("session", sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
       secure: true,
@@ -39,7 +39,7 @@ export async function login(prevState: any, formData: FormData) {
     });
 
     // Clean up old idToken cookie if it exists
-    (await cookies()).delete("idToken");
+    cookies().delete("idToken");
 
     revalidatePath("/admin");
   } catch (error: any) {
@@ -55,7 +55,8 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-  (await cookies()).delete("session");
-  (await cookies()).delete("idToken");
+  cookies().delete("session");
+  cookies().delete("idToken");
   revalidatePath("/admin");
+  redirect("/admin");
 }

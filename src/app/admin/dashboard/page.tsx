@@ -8,27 +8,23 @@ import { DashboardTabs } from './tabs';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const session = cookieStore.get('session')?.value;
-  const idToken = cookieStore.get('idToken')?.value;
 
-  if (!session && !idToken) {
-    redirect('/admin');
+  if (!session) {
+    return redirect('/admin');
   }
 
   let decodedToken;
   try {
-    if (session) {
-      decodedToken = await auth.verifySessionCookie(session, true);
-    } else if (idToken) {
-      decodedToken = await auth.verifyIdToken(idToken);
-    }
+    decodedToken = await auth.verifySessionCookie(session, true);
   } catch (error) {
-    redirect('/admin');
+    console.error("Session verification failed, redirecting to login:", error);
+    return redirect('/admin');
   }
 
   if (!decodedToken) {
-    redirect('/admin');
+    return redirect('/admin');
   }
 
   // Role check
@@ -41,15 +37,13 @@ export default async function AdminDashboardPage() {
     // If the doc exists, it MUST have role === 'admin'.
     if (userDoc.exists && userData?.role !== 'admin') {
       console.warn(`User ${decodedToken.email} attempted admin access without admin role.`);
-      redirect('/admin');
+      return redirect('/admin');
     }
     
-    // If we want to be fully strict and only allow pre-approved admins:
-    // if (!userDoc.exists || userData?.role !== 'admin') { redirect('/admin'); }
   } catch (error) {
     console.error('Error verifying admin role:', error);
-    // Allow access if Firestore fails but token is valid, to prevent lockout 
-    // unless you want maximum security.
+    // On Firestore error, redirect to login to prevent unauthorized access.
+    return redirect('/admin');
   }
 
   return (

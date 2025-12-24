@@ -5,3 +5,13 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+  # These env vars will be passed to the Next.js build and runtime.
+  # They should be set as secrets in the Google Cloud Secret Manager.
+  # e.g., gcloud secrets create FB_PROJECT_ID --data-file=./.secrets/FB_PROJECT_ID
+  env:
+    - variable: FB_PROJECT_ID
+      secret: FB_PROJECT_ID
+    - variable: FB_CLIENT_EMAIL
+      secret: FB_CLIENT_EMAIL
+    - variable: FB_PRIVATE_KEY
+      secret: FB_PRIVATE_KEY

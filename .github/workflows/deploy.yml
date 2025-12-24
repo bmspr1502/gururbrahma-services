@@ -17,8 +17,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - run: npm ci
+      
+      - run: npm i -g firebase-tools
 
       # The deploy action also needs credentials to act on your behalf
       - uses: FirebaseExtended/action-hosting-deploy@v0
