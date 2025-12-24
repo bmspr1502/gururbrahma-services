@@ -30,7 +30,17 @@ export default async function PostDetailPage({ params }: Props) {
     notFound();
   }
 
-  const postImage = PlaceHolderImages.find((p) => p.id === post.imageUrl);
+  // Handle both placeholder IDs and direct URLs for imageUrl
+  let imageUrl = post.imageUrl;
+  let imageHint = 'blog post';
+  const isPlaceholderId = !post.imageUrl.startsWith('http');
+  if (isPlaceholderId) {
+    const placeholder = PlaceHolderImages.find((p) => p.id === post.imageUrl);
+    if (placeholder) {
+      imageUrl = placeholder.imageUrl;
+      imageHint = placeholder.imageHint;
+    }
+  }
 
   return (
     <div className="bg-background">
@@ -56,17 +66,16 @@ export default async function PostDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {postImage && (
-            <div className="relative aspect-video w-full rounded-lg overflow-hidden my-8 shadow-lg">
-              <Image
-                src={postImage.imageUrl}
-                alt={post.title}
-                data-ai-hint={postImage.imageHint}
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
+          
+          <div className="relative aspect-video w-full rounded-lg overflow-hidden my-8 shadow-lg">
+            <Image
+              src={imageUrl}
+              alt={post.title}
+              data-ai-hint={imageHint}
+              fill
+              className="object-cover"
+            />
+          </div>
           
           <div 
             className="prose prose-lg dark:prose-invert max-w-none text-foreground/90 mx-auto"

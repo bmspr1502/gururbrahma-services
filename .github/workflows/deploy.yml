@@ -1,3 +1,4 @@
+
 name: Deploy to Firebase Hosting on Push to Main
 "on":
   push:
@@ -24,11 +25,14 @@ jobs:
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           projectId: ${{ secrets.FB_PROJECT_ID }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GURURBRAHMA_SERVICES }}
           channelId: live
         env:
           # This experimental flag is needed for Next.js support
           FIREBASE_CLI_EXPERIMENTS: webframeworks
-          # Authenticate the deploy action using the same service account
+          # These env vars are needed for the build step (server-side rendering)
           FB_PROJECT_ID: ${{ secrets.FB_PROJECT_ID }}
           FB_CLIENT_EMAIL: ${{ secrets.FB_CLIENT_EMAIL }}
           FB_PRIVATE_KEY: ${{ secrets.FB_PRIVATE_KEY }}
+
+    
