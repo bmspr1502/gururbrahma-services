@@ -1,3 +1,4 @@
+
 import { PostCard } from '@/components/post-card';
 import { db } from '@/firebase/server';
 import { Post } from '@/lib/types';
@@ -12,7 +13,7 @@ export default async function PostsPage() {
     const snapshot = await db.collection('posts').orderBy('createdAt', 'desc').get();
     posts = snapshot.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
-      return { id: doc.id, ...data, timestamp: data.createdAt || data.timestamp || new Date() } as Post;
+      return { id: doc.id, ...data, timestamp: data.createdAt || new Date() } as Post;
     });
   } catch (error) {
     console.error("Error fetching posts:", error);

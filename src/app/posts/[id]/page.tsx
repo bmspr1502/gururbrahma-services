@@ -1,29 +1,36 @@
-import { allPosts } from '@/lib/data';
+
+import { db } from '@/firebase/server';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
+import { Post } from '@/lib/types';
+import { serializeFirestoreData } from '@/lib/utils';
 
 type Props = {
   params: { id: string };
 };
 
-export async function generateStaticParams() {
-  return allPosts.map((post) => ({
-    id: post.id,
-  }));
-}
+export default async function PostDetailPage({ params }: Props) {
+  let post: Post | null = null;
 
-export default function PostDetailPage({ params }: Props) {
-  const post = allPosts.find((p) => p.id === params.id);
+  try {
+    const doc = await db.collection('posts').doc(params.id).get();
+    if (doc.exists) {
+      const data = serializeFirestoreData(doc.data());
+      post = { id: doc.id, ...data } as Post;
+    }
+  } catch (error) {
+    console.error("Error fetching post:", error);
+  }
 
   if (!post) {
     notFound();
   }
 
-  const postImage = PlaceHolderImages.find((p) => p.id === post.id);
+  const postImage = PlaceHolderImages.find((p) => p.id === post.imageUrl);
 
   return (
     <div className="bg-background">
@@ -34,14 +41,14 @@ export default function PostDetailPage({ params }: Props) {
             <div className="mt-4 flex justify-center items-center gap-6 text-muted-foreground text-sm">
                 <div className='flex items-center gap-2'>
                     <Calendar className='w-4 h-4'/>
-                    <time dateTime={post.timestamp.toISOString()}>
-                        {format(post.timestamp, 'LLLL d, yyyy')}
+                    <time dateTime={new Date(post.timestamp).toISOString()}>
+                        {format(new Date(post.timestamp), 'LLLL d, yyyy')}
                     </time>
                 </div>
                  <div className='flex items-center gap-2'>
                     <Tag className='w-4 h-4'/>
                     <div className="flex flex-wrap gap-2">
-                        {post.tags.map((tag) => (
+                        {post.tags?.map((tag) => (
                             <Badge key={tag} variant="secondary" className="capitalize">{tag}</Badge>
                         ))}
                     </div>

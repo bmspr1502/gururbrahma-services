@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -33,7 +34,7 @@ export function PostCard({ post }: PostCardProps) {
         </CardHeader>
         <CardContent className="p-4 flex-grow">
           <CardTitle className="text-lg leading-tight mb-2">{post.title}</CardTitle>
-          <p className="text-sm text-muted-foreground line-clamp-2">{post.content}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: post.content }}></p>
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <Button asChild variant="link" className="p-0 text-primary hover:text-secondary">
