@@ -1,11 +1,15 @@
-name: Deploy to Firebase Hosting on merge
-on:
+name: Deploy to Firebase Hosting on Push to Main
+"on":
   push:
     branches:
       - main
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    # These permissions are required by the 'firebase-hosting-deploy' action
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -15,17 +19,21 @@ jobs:
 
       - run: npm ci
 
+      # The build step needs these env vars for server-side rendering with Firebase Admin
       - run: npm run build
         env:
           FB_PROJECT_ID: ${{ secrets.FB_PROJECT_ID }}
           FB_CLIENT_EMAIL: ${{ secrets.FB_CLIENT_EMAIL }}
           FB_PRIVATE_KEY: ${{ secrets.FB_PRIVATE_KEY }}
 
+      # The deploy action also needs credentials to act on your behalf
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_GURURBRAHMA_SERVICES }}"
+          projectId: ${{ secrets.FB_PROJECT_ID }}
           channelId: live
-          projectId: studio-5159116962-cf239
         env:
+          # This experimental flag is needed for Next.js support
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+          # Authenticate the deploy action using the same service account
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GURURBRAHMA_SERVICES }}
