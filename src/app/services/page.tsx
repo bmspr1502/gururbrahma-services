@@ -3,7 +3,7 @@ import type { ServiceCategory } from '@/lib/types';
 import { ServiceCard } from '@/components/service-card';
 
 export default function ServicesPage() {
-  const categories: ServiceCategory[] = ['Purohitam', 'Jyotisham', 'Matrimony'];
+  const categories: ServiceCategory[] = ['Purohitam', 'Jyotisham'];
 
   return (
     <div className="container mx-auto px-4 py-12">

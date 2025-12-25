@@ -25,6 +25,7 @@ export function VideoManager() {
   const [type, setType] = useState<"video" | "short" | "playlist">("video");
   const [description, setDescription] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [tags, setTags] = useState("");
   
   const [loading, setLoading] = useState(false);
 
@@ -45,6 +46,7 @@ export function VideoManager() {
     setType("video");
     setDescription("");
     setThumbnailUrl("");
+    setTags("");
     setEditingId(null);
     setIsAdding(false);
   };
@@ -56,6 +58,7 @@ export function VideoManager() {
     setType(video.type || "video");
     setDescription(video.description || "");
     setThumbnailUrl(video.thumbnailUrl || "");
+    setTags(Array.isArray(video.tags) ? video.tags.join(", ") : "");
     setIsAdding(true);
   };
 
@@ -75,11 +78,13 @@ export function VideoManager() {
     }
 
     setLoading(true);
+    const tagArray = tags.split(",").map(t => t.trim()).filter(t => t !== "");
+
     let result;
     if (editingId) {
-        result = await updateVideo(editingId, url, title, type, description, thumbnailUrl);
+        result = await updateVideo(editingId, url, title, type, description, thumbnailUrl, tagArray);
     } else {
-        result = await addVideo(url, title, type, description, thumbnailUrl);
+        result = await addVideo(url, title, type, description, thumbnailUrl, tagArray);
     }
     setLoading(false);
 
@@ -159,6 +164,16 @@ export function VideoManager() {
                     </SelectContent>
                 </Select>
                 </div>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="video-tags">Tags (comma separated)</Label>
+                <Input 
+                    id="video-tags" 
+                    placeholder="puja, morning, ritual" 
+                    value={tags} 
+                    onChange={(e) => setTags(e.target.value)} 
+                />
             </div>
             
             <div className="space-y-2">
@@ -264,6 +279,14 @@ export function VideoManager() {
                             {getTypeIcon(video.type)}
                             {video.type}
                         </span>
+                        {video.tags && video.tags.length > 0 && (
+                            <div className="flex gap-1 overflow-hidden">
+                                {video.tags.slice(0, 2).map((tag: string) => (
+                                    <span key={tag} className="text-[10px] bg-muted px-1 rounded truncate max-w-[60px]">{tag}</span>
+                                ))}
+                                {video.tags.length > 2 && <span className="text-[10px] text-muted-foreground">+{video.tags.length - 2}</span>}
+                            </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-1">

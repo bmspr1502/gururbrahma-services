@@ -93,8 +93,8 @@ export const services: Service[] = [
   },
   {
     id: "matrimony-assistance",
-    category: "Matrimony",
-    name: "Sourashtra Matrimony",
+    category: "Jyotisham",
+    name: "Matrimony Assistance",
     description:
       "Personal consultation to help find matches within the community.",
     price: "Informational Only",

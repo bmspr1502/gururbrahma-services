@@ -82,7 +82,8 @@ export async function addVideo(
   title: string,
   type: "short" | "video" | "playlist",
   description: string = "",
-  thumbnailUrl: string = ""
+  thumbnailUrl: string = "",
+  tags: string[] = []
 ) {
   try {
     await db.collection("videos").add({
@@ -91,6 +92,7 @@ export async function addVideo(
       type,
       description,
       thumbnailUrl,
+      tags,
       timestamp: new Date(),
     });
     revalidatePath("/video");
@@ -108,7 +110,8 @@ export async function updateVideo(
   title: string,
   type: "short" | "video" | "playlist",
   description: string,
-  thumbnailUrl: string = ""
+  thumbnailUrl: string = "",
+  tags: string[] = []
 ) {
   try {
     await db.collection("videos").doc(id).update({
@@ -117,6 +120,7 @@ export async function updateVideo(
       type,
       description,
       thumbnailUrl,
+      tags,
       updatedAt: new Date(),
     });
     revalidatePath("/video");
