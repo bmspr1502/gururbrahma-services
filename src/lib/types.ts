@@ -21,12 +21,15 @@ export type Post = {
   imageUrl: string;
   timestamp: Date;
   tags: string[];
+  images?: string[];
+  documents?: { name: string; url: string }[];
 };
 
 export type Video = {
   id: string;
   youtubeUrl: string;
   title: string;
-  type: "short" | "video";
+  type: "short" | "video" | "playlist";
+  description?: string;
   timestamp: Date;
 };
