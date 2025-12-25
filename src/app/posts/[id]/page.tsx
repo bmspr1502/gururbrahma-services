@@ -12,7 +12,7 @@ import { serializeFirestoreData } from '@/lib/utils';
 import { Carousel } from '@/components/carousel';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 interface ExtendedPost extends Post {
@@ -20,7 +20,8 @@ interface ExtendedPost extends Post {
   documents?: { name: string; url: string }[];
 }
 
-export default async function PostDetailPage({ params }: Props) {
+export default async function PostDetailPage(props: Props) {
+  const params = await props.params;
   let post: ExtendedPost | null = null;
 
   try {
@@ -37,16 +38,23 @@ export default async function PostDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Handle both placeholder IDs and direct URLs for imageUrl
-  let imageUrl = post.imageUrl;
-  let imageHint = 'blog post';
-  const isPlaceholderId = !post.imageUrl.startsWith('http');
-  if (isPlaceholderId) {
-    const placeholder = PlaceHolderImages.find((p) => p.id === post.imageUrl);
-    if (placeholder) {
-      imageUrl = placeholder.imageUrl;
-      imageHint = placeholder.imageHint;
-    }
+  const hasImages = post.images && post.images.length > 0;
+
+  // Handle fallback image if no gallery is present
+  let fallbackImageUrl: string | null = null;
+  let fallbackImageHint = 'blog post';
+  
+  if (!hasImages && post.imageUrl) {
+      const isPlaceholderId = !post.imageUrl.startsWith('http');
+      if (isPlaceholderId) {
+        const placeholder = PlaceHolderImages.find((p) => p.id === post.imageUrl);
+        if (placeholder) {
+          fallbackImageUrl = placeholder.imageUrl;
+          fallbackImageHint = placeholder.imageHint;
+        }
+      } else {
+          fallbackImageUrl = post.imageUrl;
+      }
   }
 
   return (
@@ -73,40 +81,39 @@ export default async function PostDetailPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="relative aspect-video w-full rounded-lg overflow-hidden my-8 shadow-lg">
-            <Image
-              src={imageUrl}
-              alt={post.title}
-              data-ai-hint={imageHint}
-              fill
-              className="object-cover"
-            />
-          </div>
-          
-          <div 
-            className="prose prose-lg dark:prose-invert max-w-none text-foreground/90 mx-auto"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-
-          {/* Image Gallery */}
-          {post.images && post.images.length > 0 && (
-            <div className="my-12">
-                <h3 className="text-2xl font-bold mb-4">Gallery</h3>
+          {/* Image Display Logic: Carousel > Fallback Image */}
+          {hasImages ? (
+            <div className="my-8 shadow-lg rounded-lg overflow-hidden">
                 <Carousel 
                     className="w-full"
-                    slides={post.images.map((img, idx) => (
+                    slides={post.images!.map((img, idx) => (
                         <div key={idx} className="relative aspect-video w-full">
                             <Image 
                                 src={img} 
-                                alt={`Gallery image ${idx + 1}`}
+                                alt={`Image ${idx + 1}`}
                                 fill
-                                className="object-cover rounded-lg"
+                                className="object-cover"
                             />
                         </div>
                     ))}
                 />
             </div>
-          )}
+          ) : fallbackImageUrl ? (
+            <div className="relative aspect-video w-full rounded-lg overflow-hidden my-8 shadow-lg">
+                <Image
+                src={fallbackImageUrl}
+                alt={post.title}
+                data-ai-hint={fallbackImageHint}
+                fill
+                className="object-cover"
+                />
+            </div>
+          ) : null}
+          
+          <div 
+            className="prose prose-lg dark:prose-invert max-w-none text-foreground/90 mx-auto"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
 
           {/* Documents */}
           {post.documents && post.documents.length > 0 && (

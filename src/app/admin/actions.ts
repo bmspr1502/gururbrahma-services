@@ -60,3 +60,17 @@ export async function logout() {
   revalidatePath("/admin");
   redirect("/admin");
 }
+
+export async function generateCustomToken() {
+  const session = (await cookies()).get("__session")?.value;
+  if (!session) return null;
+
+  try {
+    const decodedClaims = await adminAuth.verifySessionCookie(session, true);
+    const customToken = await adminAuth.createCustomToken(decodedClaims.uid);
+    return customToken;
+  } catch (error) {
+    console.error("Error generating custom token:", error);
+    return null;
+  }
+}

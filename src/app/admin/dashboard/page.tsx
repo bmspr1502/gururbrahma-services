@@ -4,6 +4,7 @@ import { auth, db } from '@/firebase/server';
 import { Button } from '@/components/ui/button';
 import { logout } from '../actions';
 import { DashboardTabs } from './tabs';
+import { AuthSync } from '@/components/auth-sync';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <AuthSync />
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold">Admin Portal</h1>

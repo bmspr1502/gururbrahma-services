@@ -12,8 +12,8 @@ interface VideoCardProps {
 }
 
 const getYoutubeThumbnail = (url: string): string | null => {
-  const videoIdMatch = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  const videoId = videoIdMatch ? videoIdMatch[1] : null;
+  const videoIdMatch = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/);
+  const videoId = (videoIdMatch && videoIdMatch[2].length === 11) ? videoIdMatch[2] : null;
   if (videoId) {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   }
@@ -29,7 +29,7 @@ const getTypeIcon = (t: string) => {
 };
 
 export function VideoCard({ video }: VideoCardProps) {
-  const thumbnailUrl = getYoutubeThumbnail(video.youtubeUrl);
+  const thumbnailUrl = video.thumbnailUrl || getYoutubeThumbnail(video.youtubeUrl);
   const isPlaylist = video.type === 'playlist';
 
   return (
@@ -61,7 +61,7 @@ export function VideoCard({ video }: VideoCardProps) {
             
             <div className="flex items-center gap-2 mb-2">
                  <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium uppercase tracking-wider">
-                    {getTypeIcon(video.type)} {video.type}
+                    {getTypeIcon(video.type)} {video.type === 'short' ? 'Shorts' : video.type}
                  </span>
             </div>
 

@@ -10,9 +10,10 @@ import { addVideo, updateVideo, deleteVideo } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
-import { Trash2, ExternalLink, Play, Edit, Plus, MonitorPlay, Film, ListVideo } from "lucide-react";
+import { Trash2, ExternalLink, Play, Edit, Plus, MonitorPlay, Film, ListVideo, ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { ImageUploader } from "@/components/image-uploader";
 
 export function VideoManager() {
   const { toast } = useToast();
@@ -23,6 +24,7 @@ export function VideoManager() {
   const [title, setTitle] = useState("");
   const [type, setType] = useState<"video" | "short" | "playlist">("video");
   const [description, setDescription] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +34,7 @@ export function VideoManager() {
 
   const getYoutubeId = (url: string) => {
     // Handle playlist URLs too if possible, but basic ID extraction for video/shorts
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
@@ -42,6 +44,7 @@ export function VideoManager() {
     setTitle("");
     setType("video");
     setDescription("");
+    setThumbnailUrl("");
     setEditingId(null);
     setIsAdding(false);
   };
@@ -52,6 +55,7 @@ export function VideoManager() {
     setTitle(video.title);
     setType(video.type || "video");
     setDescription(video.description || "");
+    setThumbnailUrl(video.thumbnailUrl || "");
     setIsAdding(true);
   };
 
@@ -73,9 +77,9 @@ export function VideoManager() {
     setLoading(true);
     let result;
     if (editingId) {
-        result = await updateVideo(editingId, url, title, type, description);
+        result = await updateVideo(editingId, url, title, type, description, thumbnailUrl);
     } else {
-        result = await addVideo(url, title, type, description);
+        result = await addVideo(url, title, type, description, thumbnailUrl);
     }
     setLoading(false);
 
@@ -96,6 +100,12 @@ export function VideoManager() {
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
+  };
+
+  const handleThumbnailUpload = (urls: string[]) => {
+      if (urls.length > 0) {
+          setThumbnailUrl(urls[0]);
+      }
   };
 
   const getTypeIcon = (t: string) => {
@@ -123,7 +133,7 @@ export function VideoManager() {
             <CardTitle>{editingId ? "Edit Video" : "Add New Video"}</CardTitle>
             <CardDescription>Enter a YouTube link and title to display it on the site.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                 <Label htmlFor="video-title" className="flex items-center gap-1">
@@ -157,7 +167,7 @@ export function VideoManager() {
                 </Label>
                 <Input 
                 id="video-url" 
-                placeholder="https://www.youtube.com/watch?v=..." 
+                placeholder="https://www.youtube.com/watch?v=... or Playlist URL" 
                 value={url} 
                 onChange={(e) => setUrl(e.target.value)} 
                 />
@@ -166,6 +176,31 @@ export function VideoManager() {
             <div className="space-y-2">
                 <Label>Description</Label>
                 <RichTextEditor content={description} onChange={setDescription} />
+            </div>
+
+            <div className="space-y-4 rounded-lg border p-4 bg-background/50">
+                <h3 className="font-semibold flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" /> Custom Thumbnail (Optional)
+                </h3>
+                <p className="text-xs text-muted-foreground">Recommended for Playlists or if you want to override the default YouTube thumbnail.</p>
+
+                {thumbnailUrl && (
+                    <div className="relative aspect-video w-48 rounded-md overflow-hidden border">
+                         <Image src={thumbnailUrl} alt="Thumbnail preview" fill className="object-cover" />
+                         <button 
+                            onClick={() => setThumbnailUrl("")}
+                            type="button"
+                            className="absolute right-1 top-1 p-1 bg-destructive text-white rounded-full hover:bg-destructive/80"
+                        >
+                            <X className="w-3 h-3" />
+                        </button>
+                    </div>
+                )}
+                
+                <ImageUploader 
+                    path={`videos/${editingId || 'new'}/thumbnails`} 
+                    onUpload={handleThumbnailUpload} 
+                />
             </div>
 
             <div className="flex gap-4">
@@ -195,20 +230,24 @@ export function VideoManager() {
             <div className="divide-y divide-border">
               {videos?.map((video: any) => {
                 const videoId = getYoutubeId(video.youtubeUrl);
+                const displayThumbnail = video.thumbnailUrl || (videoId ? `https://img.youtube.com/vi/${videoId}/default.jpg` : null);
+                
                 return (
                   <div key={video.id} className="py-4 flex items-center gap-4">
                     <div className="relative w-24 aspect-video rounded-md overflow-hidden bg-muted flex-shrink-0 border flex items-center justify-center">
-                      {videoId ? (
+                      {displayThumbnail ? (
                         <>
                             <Image 
-                            src={`https://img.youtube.com/vi/${videoId}/default.jpg`}
+                            src={displayThumbnail}
                             alt=""
                             fill
                             className="object-cover"
                             />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                <Play className="w-4 h-4 text-white" />
-                            </div>
+                            {!video.thumbnailUrl && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <Play className="w-4 h-4 text-white" />
+                                </div>
+                            )}
                         </>
                       ) : (
                         <div className="bg-primary/10 w-full h-full flex items-center justify-center">

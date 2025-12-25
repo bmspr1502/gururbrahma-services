@@ -81,7 +81,8 @@ export async function addVideo(
   youtubeUrl: string,
   title: string,
   type: "short" | "video" | "playlist",
-  description: string = ""
+  description: string = "",
+  thumbnailUrl: string = ""
 ) {
   try {
     await db.collection("videos").add({
@@ -89,6 +90,7 @@ export async function addVideo(
       title,
       type,
       description,
+      thumbnailUrl,
       timestamp: new Date(),
     });
     revalidatePath("/video");
@@ -105,7 +107,8 @@ export async function updateVideo(
   youtubeUrl: string,
   title: string,
   type: "short" | "video" | "playlist",
-  description: string
+  description: string,
+  thumbnailUrl: string = ""
 ) {
   try {
     await db.collection("videos").doc(id).update({
@@ -113,6 +116,7 @@ export async function updateVideo(
       title,
       type,
       description,
+      thumbnailUrl,
       updatedAt: new Date(),
     });
     revalidatePath("/video");

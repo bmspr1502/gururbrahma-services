@@ -31,5 +31,6 @@ export type Video = {
   title: string;
   type: "short" | "video" | "playlist";
   description?: string;
+  thumbnailUrl?: string;
   timestamp: Date;
 };

@@ -28,7 +28,6 @@ export function PostManager() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [documents, setDocuments] = useState<PostDocument[]>([]);
   
@@ -42,7 +41,6 @@ export function PostManager() {
     setTitle("");
     setContent("");
     setTags("");
-    setImageUrl("");
     setImages([]);
     setDocuments([]);
     setEditingId(null);
@@ -54,8 +52,7 @@ export function PostManager() {
     setTitle(post.title);
     setContent(post.content);
     setTags(Array.isArray(post.tags) ? post.tags.join(", ") : post.tags || "");
-    setImageUrl(post.imageUrl || "");
-    setImages(post.images || []);
+    setImages(post.images || (post.imageUrl ? [post.imageUrl] : []));
     setDocuments(post.documents || []);
     setIsAdding(true);
   };
@@ -68,12 +65,14 @@ export function PostManager() {
 
     setLoading(true);
     const tagArray = tags.split(",").map(t => t.trim()).filter(t => t !== "");
+    // Use the first image as the 'main' image for backward compatibility
+    const mainImageUrl = images.length > 0 ? images[0] : "";
     
     let result;
     if (editingId) {
-        result = await updatePost(editingId, title, content, tagArray, imageUrl, images, documents);
+        result = await updatePost(editingId, title, content, tagArray, mainImageUrl, images, documents);
     } else {
-        result = await addPost(title, content, tagArray, imageUrl || "https://picsum.photos/seed/spiritual/800/400", images, documents);
+        result = await addPost(title, content, tagArray, mainImageUrl, images, documents);
     }
     
     setLoading(false);
@@ -161,23 +160,11 @@ export function PostManager() {
               <RichTextEditor content={content} onChange={setContent} />
             </div>
 
-            {/* Featured Image - Keeping plain URL for backward compatibility/simplicity if wanted, 
-                but usually user wants to upload this too. For now keeping as URL input per previous design,
-                but user can use Image Uploader below for gallery. */}
-            <div className="space-y-2">
-                <Label htmlFor="post-image">Featured Image URL (Main list image)</Label>
-                 <Input 
-                    id="post-image" 
-                    placeholder="https://..." 
-                    value={imageUrl} 
-                    onChange={(e) => setImageUrl(e.target.value)} 
-                />
-            </div>
-
             <div className="space-y-4 rounded-lg border p-4 bg-background/50">
                 <h3 className="font-semibold flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> Gallery Images
+                    <ImageIcon className="w-4 h-4" /> Post Images
                 </h3>
+                <p className="text-sm text-muted-foreground mb-2">Upload images for this post. The first image will be used as the preview.</p>
                 
                 {/* Image List / Carousel Preview */}
                 {images.length > 0 && (
@@ -193,6 +180,11 @@ export function PostManager() {
                                     >
                                         <X className="w-3 h-3" />
                                     </button>
+                                    {idx === 0 && (
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] py-1 text-center">
+                                            Main Image
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
