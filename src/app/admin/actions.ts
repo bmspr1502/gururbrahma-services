@@ -63,14 +63,25 @@ export async function logout() {
 
 export async function generateCustomToken() {
   const session = (await cookies()).get("__session")?.value;
-  if (!session) return null;
+  if (!session) {
+    console.log("[Auth] No session cookie found for custom token generation.");
+    return null;
+  }
 
   try {
     const decodedClaims = await adminAuth.verifySessionCookie(session, true);
+    console.log("[Auth] Session verified for UID:", decodedClaims.uid);
+
+    // createCustomToken might fail if the service account email is not known
+    // or if the IAM role 'Service Account Token Creator' is missing.
     const customToken = await adminAuth.createCustomToken(decodedClaims.uid);
     return customToken;
-  } catch (error) {
-    console.error("Error generating custom token:", error);
+  } catch (error: any) {
+    console.error(
+      "[Auth] Error generating custom token:",
+      error.message || error
+    );
+    // If it's a Signing error, we might need to tell the user to add IAM permissions
     return null;
   }
 }
