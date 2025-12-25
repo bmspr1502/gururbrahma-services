@@ -7,12 +7,14 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  const session = cookieStore.get('session')?.value;
+  const session = cookieStore.get('__session')?.value;
   let user = null;
 
   if (session) {
     try {
       user = await auth.verifySessionCookie(session, true);
+
+      console.log('user: ', user);
     } catch (error) {
       // Invalid session cookie, treat as logged out
       user = null;
@@ -23,10 +25,10 @@ export default async function AdminPage() {
     // Also verify role here to prevent redirect loop if dashboard rejects it
     try {
       const userDoc = await db.collection('users').doc(user.uid).get();
-      const isSuperAdmin = user.email === 'drbmsathyaramacharya@gmail.com';
+      // const isSuperAdmin = user.email === 'drbmsathyaramacharya@gmail.com';
       const isAdmin = userDoc.exists && userDoc.data()?.role === 'admin';
 
-      if (isSuperAdmin || isAdmin) {
+      if (isAdmin) {
         redirect('/admin/dashboard');
       } else {
         // Valid session but not admin - logout

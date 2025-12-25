@@ -31,7 +31,7 @@ export async function login(prevState: any, formData: FormData) {
       expiresIn,
     });
 
-    cookies().set("session", sessionCookie, {
+    cookies().set("__session", sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
       secure: true,
@@ -55,7 +55,7 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
-  cookies().delete("session");
+  cookies().delete("__session");
   cookies().delete("idToken");
   revalidatePath("/admin");
   redirect("/admin");

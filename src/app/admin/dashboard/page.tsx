@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies();
-  const session = cookieStore.get('session')?.value;
+  const session = cookieStore.get('__session')?.value;
 
   if (!session) {
     return redirect('/admin');

@@ -41,7 +41,7 @@ export default async function RootLayout({
 }>) {
   // Server-side check for admin status
   const cookieStore = await cookies();
-  const session = cookieStore.get('session')?.value;
+  const session = cookieStore.get('__session')?.value;
   let isAdmin = false;
 
   if (session) {
