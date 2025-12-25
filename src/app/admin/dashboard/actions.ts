@@ -2,33 +2,112 @@
 
 import { db } from "@/firebase/server";
 import { revalidatePath } from "next/cache";
+import { sendStatusUpdateEmail, sendScheduleUpdateEmail } from "@/lib/emails";
+import { serializeFirestoreData } from "@/lib/utils";
 
 // Inquiry Actions
-export async function getInquiries() {
+export async function getInquiries(showClosed = false) {
   try {
-    const snapshot = await db
-      .collection("inquiries")
-      .orderBy("timestamp", "desc")
-      .get();
+    let query = db.collection("inquiries").orderBy("timestamp", "desc");
+
+    if (!showClosed) {
+      // By default show open and confirmed, but not completed
+      query = db
+        .collection("inquiries")
+        .where("status", "in", ["open", "confirmed"])
+        .orderBy("timestamp", "desc");
+    }
+
+    const snapshot = await query.get();
     const inquiries = snapshot.docs.map((doc: any) => {
-      const data = doc.data();
-      // Manual serialization for simple fields, helper would be better but keeping it self-contained
+      const data = serializeFirestoreData(doc.data());
       return {
         id: doc.id,
         ...data,
-        // Ensure Dates are serializable numbers or ISO strings for client
-        timestamp: data.timestamp?.toDate
-          ? data.timestamp.toDate()
-          : new Date(),
-        preferredDate: data.preferredDate?.toDate
-          ? data.preferredDate.toDate()
-          : null,
       };
     });
     return { success: true, data: inquiries };
   } catch (error) {
     console.error("Error fetching inquiries:", error);
     return { success: false, error: "Failed to fetch inquiries." };
+  }
+}
+
+export async function updateInquiryStatus(
+  id: string,
+  status: "open" | "confirmed" | "completed"
+) {
+  try {
+    const docRef = db.collection("inquiries").doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) throw new Error("Inquiry not found");
+
+    const oldData = doc.data();
+    await docRef.update({ status, updatedAt: new Date() });
+
+    // Send email if status changed to confirmed
+    if (status === "confirmed" && oldData?.status !== "confirmed") {
+      const fullData = {
+        ...oldData,
+        status,
+        preferredDate: oldData?.preferredDate?.toDate
+          ? oldData.preferredDate.toDate()
+          : null,
+      };
+      await sendStatusUpdateEmail(fullData, status);
+    }
+
+    revalidatePath("/admin/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating inquiry status:", error);
+    return { success: false, error: "Failed to update status." };
+  }
+}
+
+export async function updateInquirySchedule(
+  id: string,
+  date: Date,
+  time: string
+) {
+  try {
+    const docRef = db.collection("inquiries").doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) throw new Error("Inquiry not found");
+
+    const oldData = doc.data();
+    await docRef.update({
+      preferredDate: date,
+      preferredTime: time,
+      updatedAt: new Date(),
+    });
+
+    // Send email about schedule change
+    const fullData = {
+      ...oldData,
+      preferredDate: date,
+      preferredTime: time,
+    };
+    await sendScheduleUpdateEmail(fullData);
+
+    revalidatePath("/admin/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating inquiry schedule:", error);
+    return { success: false, error: "Failed to update schedule." };
+  }
+}
+
+export async function deleteInquiry(id: string) {
+  try {
+    await db.collection("inquiries").doc(id).delete();
+    revalidatePath("/admin/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting inquiry:", error);
+    return { success: false, error: "Failed to delete inquiry." };
   }
 }
 
@@ -60,13 +139,10 @@ export async function getHomeNotification() {
       .doc("home-notification")
       .get();
     if (doc.exists) {
-      const data = doc.data();
+      const data = serializeFirestoreData(doc.data());
       return {
         success: true,
-        data: {
-          ...data,
-          updatedAt: data?.updatedAt?.toDate ? data.updatedAt.toDate() : null,
-        },
+        data,
       };
     }
     return { success: true, data: null };

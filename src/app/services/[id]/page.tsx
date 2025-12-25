@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { RequestServiceForm } from "./request-service-form";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function generateStaticParams() {
@@ -15,7 +15,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function ServiceDetailPage({ params }: Props) {
+export default async function ServiceDetailPage(props: Props) {
+  const params = await props.params;
   const service = services.find((s) => s.id === params.id);
 
   if (!service) {

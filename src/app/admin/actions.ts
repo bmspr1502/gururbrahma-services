@@ -74,17 +74,29 @@ export async function generateCustomToken() {
 
     try {
       const customToken = await adminAuth.createCustomToken(decodedClaims.uid);
+      console.log(
+        "[Auth] Custom token created successfully for UID:",
+        decodedClaims.uid
+      );
       return customToken;
     } catch (tokenError: any) {
       console.error(
         "[Auth] Error creating custom token (Admin SDK):",
+        tokenError.code || "unknown_code",
         tokenError.message || tokenError
       );
+      // Specifically helpful for Service Account Token Creator role issues
+      if (tokenError.code === "auth/insufficient-permission") {
+        console.error(
+          "[Auth] HINT: The service account may need 'Service Account Token Creator' role in Google Cloud Console."
+        );
+      }
       return null;
     }
   } catch (error: any) {
     console.error(
-      "[Auth] Error in generateCustomToken (session verification or outer scope):",
+      "[Auth] Error verifying session cookie:",
+      error.code || "unknown_code",
       error.message || error
     );
     return null;

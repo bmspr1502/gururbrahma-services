@@ -35,3 +35,20 @@ export type Video = {
   tags?: string[];
   timestamp: Date;
 };
+
+export type InquiryStatus = "open" | "confirmed" | "completed";
+
+export type Inquiry = {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  name: string;
+  email: string;
+  phone: string;
+  preferredDate: Date;
+  preferredTime: string;
+  description?: string;
+  rashiNakshatra?: string;
+  status: InquiryStatus;
+  timestamp: Date;
+};
