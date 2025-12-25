@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { BackgroundPattern } from '@/components/background-pattern';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { Analytics } from '@/components/analytics';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://gururbrahma.in'),
@@ -74,6 +75,7 @@ export default async function RootLayout({
           </div>
           <Footer isAdmin={isAdmin} />
           <Toaster />
+          <Analytics />
         </FirebaseClientProvider>
       </body>
     </html>
