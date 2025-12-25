@@ -20,7 +20,7 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-lg shadow-md transition-colors duration-300 bg-black/90`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-lg shadow-md transition-all duration-300 ${isAdmin ? 'bg-black/90' : 'bg-primary/95'}`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-3">
           <Logo className="h-8 w-8 text-accent" />
@@ -53,7 +53,7 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] bg-black text-white border-white/10">
+            <SheetContent side="right" className={`w-[300px] text-white border-white/10 ${isAdmin ? 'bg-black' : 'bg-primary'}`}>
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
