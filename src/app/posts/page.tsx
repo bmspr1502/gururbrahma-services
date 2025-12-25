@@ -1,20 +1,45 @@
 
-import { PostCard } from '@/components/post-card';
 import { db } from '@/firebase/server';
 import { Post } from '@/lib/types';
 import { serializeFirestoreData } from '@/lib/utils';
+import { PostsFeed } from '@/components/posts-feed';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PostsPage() {
-  let posts: Post[] = [];
+  let initialPosts: Post[] = [];
+  let initialCursor: string | null = null;
+  let allTags: string[] = [];
 
   try {
-    const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
-    posts = snapshot.docs.map((doc: any) => {
+    // 1. Fetch first batch of posts (Limit 10)
+    const snapshot = await db.collection('posts')
+        .orderBy('timestamp', 'desc')
+        .limit(10)
+        .get();
+
+    initialPosts = snapshot.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
       return { id: doc.id, ...data } as Post;
     });
+
+    if (initialPosts.length > 0) {
+        initialCursor = initialPosts[initialPosts.length - 1].timestamp.toISOString();
+    }
+
+    // 2. Ideally fetch unique tags. Since firestore doesn't support aggregate distinct easily,
+    // we can either:
+    // a) Just use tags from the first 50 posts (cheap)
+    // b) Have a separate scheduled function to aggregate tags (best practice)
+    // c) For now, load slightly more posts just to seed tags? Or just rely on loaded posts.
+    // Let's rely on loaded posts + previous batch for simplicity and performance.
+    // If the user wants specific tags to be ALWAYS visible, they should be hardcoded or stored separately.
+    // I'll grab tags from the first 50 items (metadata only query if possible, but firestore reads full doc).
+    // Let's just stick to tags found in `initialPosts` passed to the component for now. 
+    // The component will accumulate tags as user loads more, or we can fetch a separate "tags list" if we had one.
+    // I will extract tags from `initialPosts`.
+    allTags = Array.from(new Set(initialPosts.flatMap(p => p.tags || []))).sort();
+
   } catch (error) {
     console.error("Error fetching posts:", error);
   }
@@ -28,17 +53,11 @@ export default async function PostsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            No posts found.
-          </div>
-        )}
-      </div>
+      <PostsFeed 
+        initialPosts={initialPosts} 
+        initialCursor={initialCursor} 
+        allTags={allTags}
+      />
     </div>
   );
 }

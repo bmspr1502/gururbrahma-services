@@ -1,6 +1,6 @@
 import type React from "react";
 
-export type ServiceCategory = "Purohitam" | "Jyotisham" | "Matrimony";
+export type ServiceCategory = "Purohitam" | "Jyotisham";
 
 export type Service = {
   id: string;
@@ -32,5 +32,6 @@ export type Video = {
   type: "short" | "video" | "playlist";
   description?: string;
   thumbnailUrl?: string;
+  tags?: string[];
   timestamp: Date;
 };

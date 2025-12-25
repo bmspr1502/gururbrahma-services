@@ -33,14 +33,11 @@ export default function ContactPage() {
               {/* Replace with actual picture */}
               <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-accent/10">
                  <Image 
-                   src="/logo.png" // Placeholder or actual image
+                   src="https://firebasestorage.googleapis.com/v0/b/studio-5159116962-cf239.firebasestorage.app/o/posts%2FnNwjQxQJLI5TkM16ZyjN%2Fimages%2F1766646262302_WhatsApp%20Image%202025-04-14%20at%2019.30.01.jpeg?alt=media&token=719e07e5-1693-4dc9-ab39-30e369aa1b94" // Placeholder or actual image
                    alt={contactDetails.name}
                    fill
                    className="object-cover"
                  />
-                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white font-bold text-center p-4">
-                    [Dad's Picture Here]
-                 </div>
               </div>
             </div>
             <div className="p-8 md:w-2/3">

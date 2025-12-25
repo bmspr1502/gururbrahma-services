@@ -1,21 +1,34 @@
 
 import { db } from '@/firebase/server';
-import { VideoCard } from '@/components/video-card';
 import { Video } from '@/lib/types';
 import { Youtube } from 'lucide-react';
 import { serializeFirestoreData } from '@/lib/utils';
+import { VideosFeed } from '@/components/videos-feed';
 
 export const dynamic = 'force-dynamic';
 
 export default async function VideosPage() {
-  let videos: Video[] = [];
+  let initialVideos: Video[] = [];
+  let initialCursor: string | null = null;
+  let allTags: string[] = [];
   
   try {
-    const snapshot = await db.collection('videos').orderBy('timestamp', 'desc').get();
-    videos = snapshot.docs.map((doc: any) => {
+    const snapshot = await db.collection('videos')
+        .orderBy('timestamp', 'desc')
+        .limit(10)
+        .get();
+
+    initialVideos = snapshot.docs.map((doc: any) => {
       const data = serializeFirestoreData(doc.data());
       return { id: doc.id, ...data } as Video;
     });
+
+    if (initialVideos.length > 0) {
+        initialCursor = initialVideos[initialVideos.length - 1].timestamp.toISOString();
+    }
+
+    allTags = Array.from(new Set(initialVideos.flatMap(v => v.tags || []))).sort();
+
   } catch (error) {
     console.error("Error fetching videos:", error);
   }
@@ -32,17 +45,11 @@ export default async function VideosPage() {
         </p>
       </div>
 
-      {videos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {videos.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-20 bg-muted/30 rounded-2xl border-2 border-dashed border-muted">
-          <p className="text-muted-foreground text-xl">No videos found yet. Check back soon!</p>
-        </div>
-      )}
+      <VideosFeed 
+        initialVideos={initialVideos} 
+        initialCursor={initialCursor} 
+        allTags={allTags}
+      />
     </div>
   );
 }
