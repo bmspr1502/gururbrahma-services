@@ -50,7 +50,16 @@ export function PostCard({ post }: PostCardProps) {
         </CardHeader>
         <CardContent className="p-4 flex-grow">
           <CardTitle className="text-lg leading-tight mb-2">{post.title}</CardTitle>
-          <div className="text-sm text-muted-foreground line-clamp-2" dangerouslySetInnerHTML={{ __html: post.content }}></div>
+          <div className="text-sm text-muted-foreground line-clamp-2 mb-3" dangerouslySetInnerHTML={{ __html: post.content }}></div>
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-auto">
+              {post.tags.map(tag => (
+                <span key={tag} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <Button asChild variant="link" className="p-0 text-primary hover:text-secondary">

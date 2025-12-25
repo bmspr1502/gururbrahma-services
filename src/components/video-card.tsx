@@ -59,10 +59,15 @@ export function VideoCard({ video }: VideoCardProps) {
           <CardContent className="p-4 flex flex-col gap-2 flex-grow">
             <h3 className="font-semibold leading-tight line-clamp-2 text-lg group-hover:text-primary transition-colors">{video.title}</h3>
             
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
                  <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium uppercase tracking-wider">
                     {getTypeIcon(video.type)} {video.type === 'short' ? 'Shorts' : video.type}
                  </span>
+                 {video.tags && video.tags.map(tag => (
+                   <span key={tag} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
+                     {tag}
+                   </span>
+                 ))}
             </div>
 
             {video.description && (

@@ -20,11 +20,11 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-lg shadow-md transition-colors duration-300 ${isAdmin ? "bg-black" : "bg-primary/80"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-lg shadow-md transition-colors duration-300 bg-black/90`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-3">
           <Logo className="h-8 w-8 text-accent" />
-          <span className="text-xl font-bold font-headline hidden sm:inline">Gururbrahma Services</span>
+          <span className="text-lg sm:text-xl font-bold font-headline">Gururbrahma Services</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -53,17 +53,13 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] bg-primary text-primary-foreground">
+            <SheetContent side="right" className="w-[300px] bg-black text-white border-white/10">
               <div className="flex h-full flex-col">
-                <div className="flex items-center justify-between border-b border-primary-foreground/20 pb-4">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
                     <Logo className="h-6 w-6 text-accent" />
                     <span className="text-lg font-bold font-headline">Gururbrahma</span>
                   </Link>
-                  <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>
-                    <X className="h-6 w-6" />
-                    <span className="sr-only">Close menu</span>
-                  </Button>
                 </div>
                 <nav className="mt-8 flex flex-col gap-6">
                   {navLinks.map((link) => (
@@ -76,6 +72,15 @@ export function Header({ isAdmin = false }: { isAdmin?: boolean }) {
                       {link.name}
                     </Link>
                   ))}
+                  {isAdmin && (
+                    <Link
+                      href="/admin/dashboard"
+                      className="text-lg font-medium transition-colors text-accent hover:text-accent/80"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Admin Portal
+                    </Link>
+                  )}
                 </nav>
                 <Button asChild className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
                   <Link href="/services" onClick={() => setIsMenuOpen(false)}>Book Now</Link>

@@ -89,17 +89,11 @@ export function VideosFeed({ initialVideos, initialCursor, allTags = [] }: Video
         {/* Type Filter Tabs */}
         <div className="flex justify-center">
             <Tabs defaultValue="all" value={activeType} onValueChange={handleTypeChange} className="w-full sm:w-auto">
-                <TabsList className="grid w-full grid-cols-4 sm:w-[400px]">
+                <TabsList className="grid w-full grid-cols-4 sm:w-[480px]">
                     <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="video" className="gap-2">
-                        <MonitorPlay className="w-3 h-3" /> <span className="hidden sm:inline">Videos</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="short" className="gap-2">
-                        <Film className="w-3 h-3" /> <span className="hidden sm:inline">Shorts</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="playlist" className="gap-2">
-                         <ListVideo className="w-3 h-3" /> <span className="hidden sm:inline">Playlists</span>
-                    </TabsTrigger>
+                    <TabsTrigger value="video">Videos</TabsTrigger>
+                    <TabsTrigger value="short">Shorts</TabsTrigger>
+                    <TabsTrigger value="playlist">Playlists</TabsTrigger>
                 </TabsList>
             </Tabs>
         </div>
