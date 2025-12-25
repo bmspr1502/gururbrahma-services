@@ -2,7 +2,7 @@ name: Deploy to Firebase Hosting on Push to Main
 "on":
   push:
     branches:
-      - main
+      - main # STRICT: Only deploys when code is pushed/merged to main
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest

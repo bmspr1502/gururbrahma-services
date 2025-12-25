@@ -80,13 +80,17 @@ export async function getHomeNotification() {
 export async function addVideo(
   youtubeUrl: string,
   title: string,
-  type: "short" | "video"
+  type: "short" | "video" | "playlist",
+  description: string = "",
+  thumbnailUrl: string = ""
 ) {
   try {
     await db.collection("videos").add({
       youtubeUrl,
       title,
       type,
+      description,
+      thumbnailUrl,
       timestamp: new Date(),
     });
     revalidatePath("/video");
@@ -95,6 +99,32 @@ export async function addVideo(
   } catch (error) {
     console.error("Error adding video:", error);
     return { success: false, error: "Failed to add video." };
+  }
+}
+
+export async function updateVideo(
+  id: string,
+  youtubeUrl: string,
+  title: string,
+  type: "short" | "video" | "playlist",
+  description: string,
+  thumbnailUrl: string = ""
+) {
+  try {
+    await db.collection("videos").doc(id).update({
+      youtubeUrl,
+      title,
+      type,
+      description,
+      thumbnailUrl,
+      updatedAt: new Date(),
+    });
+    revalidatePath("/video");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating video:", error);
+    return { success: false, error: "Failed to update video." };
   }
 }
 
@@ -115,7 +145,9 @@ export async function addPost(
   title: string,
   content: string,
   tags: string[],
-  imageUrl: string
+  imageUrl: string,
+  images: string[] = [],
+  documents: { name: string; url: string }[] = []
 ) {
   try {
     await db.collection("posts").add({
@@ -123,6 +155,8 @@ export async function addPost(
       content,
       tags,
       imageUrl,
+      images,
+      documents,
       timestamp: new Date(),
     });
     revalidatePath("/posts");
@@ -131,6 +165,34 @@ export async function addPost(
   } catch (error) {
     console.error("Error adding post:", error);
     return { success: false, error: "Failed to add post." };
+  }
+}
+
+export async function updatePost(
+  id: string,
+  title: string,
+  content: string,
+  tags: string[],
+  imageUrl: string,
+  images: string[] = [],
+  documents: { name: string; url: string }[] = []
+) {
+  try {
+    await db.collection("posts").doc(id).update({
+      title,
+      content,
+      tags,
+      imageUrl,
+      images,
+      documents,
+      updatedAt: new Date(),
+    });
+    revalidatePath("/posts");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return { success: false, error: "Failed to update post." };
   }
 }
 
