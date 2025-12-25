@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { initializeFirebase } from "@/firebase";
+import { useFirebase } from "@/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -19,6 +19,8 @@ export function ImageUploader({ path, onUpload, className }: ImageUploaderProps)
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const { storage } = useFirebase();
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFiles(prev => [...prev, ...Array.from(e.target.files || [])]);
@@ -35,7 +37,6 @@ export function ImageUploader({ path, onUpload, className }: ImageUploaderProps)
     setUploading(true);
     setProgress(0);
 
-    const { storage } = initializeFirebase();
     const uploadedUrls: string[] = [];
     let completedCount = 0;
 
