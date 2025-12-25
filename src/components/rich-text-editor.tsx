@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
+import TiptapLink from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import { Toggle } from "@/components/ui/toggle";
 import {
@@ -36,7 +36,7 @@ export function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Link.configure({
+      TiptapLink.configure({
         openOnClick: false,
         HTMLAttributes: {
           class: "text-primary underline cursor-pointer",

@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 export function serializeFirestoreData(data: any): any {
   if (data === null || data === undefined) return data;
 
-  // Handle Dates (already serialized or standard JS Dates)
-  if (data instanceof Date) return data;
+  // Handle Dates - convert to ISO string for absolute serialization safety in Next.js 15
+  if (data instanceof Date) return data.toISOString();
 
   // Handle arrays
   if (Array.isArray(data)) {
@@ -18,22 +18,24 @@ export function serializeFirestoreData(data: any): any {
 
   // Handle objects
   if (typeof data === "object") {
-    // Check for Firestore Timestamp (Standard method for both Admin and Client SDKs)
+    // Check for Firestore Timestamp
     if (typeof data.toDate === "function") {
-      return data.toDate();
+      return data.toDate().toISOString();
     }
 
     // Check for Timestamp properties if already plain object
     if ("_seconds" in data && "_nanoseconds" in data) {
-      return new Date(data._seconds * 1000);
+      return new Date(data._seconds * 1000).toISOString();
     }
 
-    // Check for other non-plain objects or just recurse
-    const serialized: any = {};
-    for (const key in data) {
-      serialized[key] = serializeFirestoreData(data[key]);
+    // Only recurse into plain objects to avoid issues with complex classes/references
+    if (data.constructor === Object) {
+      const serialized: any = {};
+      for (const key in data) {
+        serialized[key] = serializeFirestoreData(data[key]);
+      }
+      return serialized;
     }
-    return serialized;
   }
 
   return data;

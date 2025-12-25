@@ -7,11 +7,12 @@ import { serializeFirestoreData } from "@/lib/utils";
 
 // Inquiry Actions
 export async function getInquiries(showClosed = false) {
+  console.log("[Inquiries] Fetching inquiries, showClosed:", showClosed);
   try {
     let query = db.collection("inquiries").orderBy("timestamp", "desc");
 
     if (!showClosed) {
-      // By default show open and confirmed, but not completed
+      console.log("[Inquiries] Filtering for open/confirmed status");
       query = db
         .collection("inquiries")
         .where("status", "in", ["open", "confirmed"])
@@ -19,16 +20,40 @@ export async function getInquiries(showClosed = false) {
     }
 
     const snapshot = await query.get();
+    console.log(
+      "[Inquiries] Database query successful, docs count:",
+      snapshot.size
+    );
+
     const inquiries = snapshot.docs.map((doc: any) => {
-      const data = serializeFirestoreData(doc.data());
-      return {
-        id: doc.id,
-        ...data,
-      };
+      try {
+        const data = serializeFirestoreData(doc.data());
+        return {
+          id: doc.id,
+          ...data,
+        };
+      } catch (e) {
+        console.error(`[Inquiries] Error serializing doc ${doc.id}:`, e);
+        return { id: doc.id, error: "Serialization failed" };
+      }
     });
+
+    console.log("[Inquiries] Serialization complete");
     return { success: true, data: inquiries };
-  } catch (error) {
-    console.error("Error fetching inquiries:", error);
+  } catch (error: any) {
+    console.error(
+      "[Inquiries] Error fetching inquiries:",
+      error.code || "unknown",
+      error.message || error
+    );
+    // Specifically handle index errors which are common with new filters/sorts
+    if (error.message?.includes("index")) {
+      return {
+        success: false,
+        error:
+          "This view requires a database index. Please check the server logs for the creation link.",
+      };
+    }
     return { success: false, error: "Failed to fetch inquiries." };
   }
 }

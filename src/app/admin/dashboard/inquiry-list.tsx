@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 export function InquiryList() {
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorStatus, setErrorStatus] = useState<string | null>(null);
   const [showClosed, setShowClosed] = useState(false);
   const [sortKey, setSortKey] = useState<"timestamp" | "preferredDate">("timestamp");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -23,11 +24,20 @@ export function InquiryList() {
 
   const fetchInquiries = async () => {
     setLoading(true);
-    const result = await getInquiries(showClosed);
-    if (result.success && result.data) {
-      setInquiries(result.data);
+    setErrorStatus(null);
+    try {
+        const result = await getInquiries(showClosed);
+        if (result.success && result.data) {
+          setInquiries(result.data);
+        } else if (!result.success) {
+          setErrorStatus(result.error || "Failed to load inquiries.");
+        }
+    } catch (e) {
+        console.error("Fetch inquiries error:", e);
+        setErrorStatus("An unexpected error occurred while fetching inquiries.");
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -95,6 +105,14 @@ export function InquiryList() {
       <div className="space-y-4">
         {loading ? (
           <div className="text-center py-12">Loading inquiries...</div>
+        ) : errorStatus ? (
+          <div className="text-center py-12 text-destructive border-2 border-destructive/20 rounded-lg bg-destructive/5">
+            <p className="font-semibold mb-2">Error Loading Inquiries</p>
+            <p className="text-sm">{errorStatus}</p>
+            <Button variant="outline" size="sm" onClick={fetchInquiries} className="mt-4 border-destructive text-destructive hover:bg-destructive/10">
+              Try Again
+            </Button>
+          </div>
         ) : sortedInquiries.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">No inquiries found matching current filters.</div>
         ) : (
