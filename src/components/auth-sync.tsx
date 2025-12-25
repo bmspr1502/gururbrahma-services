@@ -13,20 +13,16 @@ export function AuthSync() {
 
       // Only sign in if not already signed in
       if (!auth.currentUser) {
-        console.log("[AuthSync] Attempting to sync client auth...");
         const token = await generateCustomToken();
         if (token) {
           try {
             await signInWithCustomToken(auth, token);
-            console.log("[AuthSync] Client SDK authenticated successfully.");
           } catch (error) {
             console.error("[AuthSync] Failed to sign in with custom token:", error);
           }
         } else {
           console.warn("[AuthSync] No custom token received from server.");
         }
-      } else {
-        console.log("[AuthSync] Client SDK already authenticated as:", auth.currentUser.uid);
       }
     };
 

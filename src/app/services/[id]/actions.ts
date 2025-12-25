@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { db } from "@/firebase/server";
 import { FormSchema } from "./schema";
+import { sendNewEnquiryEmail } from "@/lib/emails";
 
 type RequestServiceResult = {
   success: boolean;
@@ -20,13 +21,25 @@ export async function requestServiceAction(
   try {
     const inquiryData = {
       ...validationResult.data,
-      status: "new",
+      status: "open",
       timestamp: new Date(),
     };
 
-    await db.collection("inquiries").add(inquiryData);
+    const docRef = await db.collection("inquiries").add(inquiryData);
 
-    console.log("New Service Inquiry Saved to Firestore:", inquiryData);
+    // Send background emails
+    try {
+      await sendNewEnquiryEmail(inquiryData);
+    } catch (emailError) {
+      console.error("Failed to send notification emails:", emailError);
+    }
+
+    console.log(
+      "New Service Inquiry Saved to Firestore (ID:",
+      docRef.id,
+      "):",
+      inquiryData
+    );
 
     return { success: true };
   } catch (error) {
