@@ -34,7 +34,7 @@ export async function login(prevState: any, formData: FormData) {
     (await cookies()).set("__session", sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
 
@@ -72,16 +72,21 @@ export async function generateCustomToken() {
     const decodedClaims = await adminAuth.verifySessionCookie(session, true);
     console.log("[Auth] Session verified for UID:", decodedClaims.uid);
 
-    // createCustomToken might fail if the service account email is not known
-    // or if the IAM role 'Service Account Token Creator' is missing.
-    const customToken = await adminAuth.createCustomToken(decodedClaims.uid);
-    return customToken;
+    try {
+      const customToken = await adminAuth.createCustomToken(decodedClaims.uid);
+      return customToken;
+    } catch (tokenError: any) {
+      console.error(
+        "[Auth] Error creating custom token (Admin SDK):",
+        tokenError.message || tokenError
+      );
+      return null;
+    }
   } catch (error: any) {
     console.error(
-      "[Auth] Error generating custom token:",
+      "[Auth] Error in generateCustomToken (session verification or outer scope):",
       error.message || error
     );
-    // If it's a Signing error, we might need to tell the user to add IAM permissions
     return null;
   }
 }
