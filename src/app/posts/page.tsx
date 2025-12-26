@@ -24,7 +24,10 @@ export default async function PostsPage() {
     });
 
     if (initialPosts.length > 0) {
-        initialCursor = initialPosts[initialPosts.length - 1].timestamp.toISOString();
+        const lastPost = initialPosts[initialPosts.length - 1];
+        initialCursor = typeof lastPost.timestamp === 'string' 
+            ? lastPost.timestamp 
+            : lastPost.timestamp.toISOString();
     }
 
     // 2. Ideally fetch unique tags. Since firestore doesn't support aggregate distinct easily,

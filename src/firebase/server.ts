@@ -7,29 +7,37 @@ import { getServiceAccount } from "./service-account";
 let adminApp: App;
 
 if (getApps().length > 0) {
-  // Use the existing app (likely pre-initialized by Cloud Run / Frameworks)
   adminApp = getApps()[0];
   console.log(`[Firebase Admin] Using existing app: ${adminApp.name}`);
 } else {
   const serviceAccount = getServiceAccount();
 
-  if (serviceAccount) {
+  // In production (App Hosting / Cloud Run), we prefer Application Default Credentials (ADC)
+  // as recommended by Firebase documentation.
+  if (process.env.NODE_ENV === "production" && !serviceAccount) {
+    console.log(
+      "[Firebase Admin] Initializing with Application Default Credentials (ADC)"
+    );
+    adminApp = initializeApp();
+  } else if (serviceAccount) {
+    // Local development or explicit Service Account override
     try {
-      console.log("Initializing Firebase Admin with Service Account");
+      console.log(
+        "[Firebase Admin] Initializing with Service Account Credentials"
+      );
       adminApp = initializeApp({
         credential: cert(serviceAccount),
       });
     } catch (error) {
       console.error(
-        "Failed to initialize with Service Account. Falling back to default.",
+        "[Firebase Admin] Failed to initialize with Service Account. Falling back to default.",
         error
       );
-      // Fallback if the specific credential fails
       adminApp = initializeApp();
     }
   } else {
-    // This will use Application Default Credentials on Google Cloud.
-    console.log("Initializing Firebase Admin with Default Credentials");
+    // Fallback for other environments
+    console.log("[Firebase Admin] Initializing with default settings");
     adminApp = initializeApp();
   }
 }

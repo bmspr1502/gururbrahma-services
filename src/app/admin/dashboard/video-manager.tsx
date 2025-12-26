@@ -6,14 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { addVideo, updateVideo, deleteVideo } from "./actions";
+import { addVideo, updateVideo, deleteVideo, getVideos } from "./actions";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
-import { Trash2, ExternalLink, Play, Edit, Plus, MonitorPlay, Film, ListVideo, ImageIcon, X } from "lucide-react";
+import { Trash2, ExternalLink, Play, Edit, Plus, MonitorPlay, Film, ListVideo, ImageIcon, X, RefreshCw, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { RichTextEditor } from "@/components/rich-text-editor";
 import { ImageUploader } from "@/components/image-uploader";
+import { useEffect } from "react";
 
 export function VideoManager() {
   const { toast } = useToast();
@@ -28,10 +27,30 @@ export function VideoManager() {
   const [tags, setTags] = useState("");
   
   const [loading, setLoading] = useState(false);
+  const [videos, setVideos] = useState<any[]>([]);
+  const [fetching, setFetching] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const firestore = useFirestore();
-  const videosQuery = useMemoFirebase(() => query(collection(firestore, "videos"), orderBy("timestamp", "desc")), [firestore]);
-  const { data: videos, isLoading: fetching } = useCollection(videosQuery);
+  const fetchVideos = async () => {
+    setFetching(true);
+    setFetchError(null);
+    try {
+      const result = await getVideos();
+      if (result.success) {
+        setVideos(result.data || []);
+      } else {
+        setFetchError(result.error || "Failed to load videos.");
+      }
+    } catch (e: any) {
+      setFetchError(e.message || "An unexpected error occurred.");
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
 
   const getYoutubeId = (url: string) => {
     // Handle playlist URLs too if possible, but basic ID extraction for video/shorts
@@ -91,6 +110,7 @@ export function VideoManager() {
     if (result.success) {
       toast({ title: "Success", description: editingId ? "Video updated." : "Video added." });
       resetForm();
+      fetchVideos();
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -102,6 +122,7 @@ export function VideoManager() {
     const result = await deleteVideo(id);
     if (result.success) {
       toast({ title: "Success", description: "Video deleted." });
+      fetchVideos();
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -238,8 +259,20 @@ export function VideoManager() {
         </CardHeader>
         <CardContent>
           {fetching ? (
-            <div className="text-center py-4">Loading videos...</div>
-          ) : videos?.length === 0 ? (
+            <div className="text-center py-8 flex flex-col items-center gap-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-primary" />
+              <div className="text-muted-foreground">Loading videos...</div>
+            </div>
+          ) : fetchError ? (
+            <div className="text-center py-8 border-2 border-destructive/20 rounded-lg bg-destructive/5">
+                <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-2" />
+                <p className="font-semibold text-destructive">Error Loading Videos</p>
+                <p className="text-sm text-destructive-foreground/70 mb-4">{fetchError}</p>
+                <Button variant="outline" size="sm" onClick={fetchVideos} className="gap-2">
+                    <RefreshCw className="w-4 h-4" /> Try Again
+                </Button>
+            </div>
+          ) : videos.length === 0 ? (
             <div className="text-center py-4 text-muted-foreground">No videos found.</div>
           ) : (
             <div className="divide-y divide-border">

@@ -24,7 +24,10 @@ export default async function VideosPage() {
     });
 
     if (initialVideos.length > 0) {
-        initialCursor = initialVideos[initialVideos.length - 1].timestamp.toISOString();
+        const lastVideo = initialVideos[initialVideos.length - 1];
+        initialCursor = typeof lastVideo.timestamp === 'string' 
+            ? lastVideo.timestamp 
+            : lastVideo.timestamp.toISOString();
     }
 
     allTags = Array.from(new Set(initialVideos.flatMap(v => v.tags || []))).sort();

@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { addPost, updatePost, deletePost } from "./actions";
+import { addPost, updatePost, deletePost, getPosts } from "./actions";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, query, orderBy } from "firebase/firestore";
-import { Trash2, Edit, Plus, FileText, X, ImageIcon, File as FileIcon } from "lucide-react";
+import { Trash2, Edit, Plus, FileText, X, ImageIcon, File as FileIcon, RefreshCw, AlertCircle } from "lucide-react";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { useEffect } from "react";
 import { ImageUploader } from "@/components/image-uploader";
 import { DocumentUploader } from "@/components/document-uploader";
 import { Carousel } from "@/components/carousel";
@@ -32,10 +31,30 @@ export function PostManager() {
   const [documents, setDocuments] = useState<PostDocument[]>([]);
   
   const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [fetching, setFetching] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  const firestore = useFirestore();
-  const postsQuery = useMemoFirebase(() => query(collection(firestore, "posts"), orderBy("timestamp", "desc")), [firestore]);
-  const { data: posts, isLoading: fetching } = useCollection(postsQuery);
+  const fetchPosts = async () => {
+    setFetching(true);
+    setFetchError(null);
+    try {
+      const result = await getPosts();
+      if (result.success) {
+        setPosts(result.data || []);
+      } else {
+        setFetchError(result.error || "Failed to load posts.");
+      }
+    } catch (e: any) {
+      setFetchError(e.message || "An unexpected error occurred.");
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   const resetForm = () => {
     setTitle("");
@@ -80,6 +99,7 @@ export function PostManager() {
     if (result.success) {
       toast({ title: "Success", description: editingId ? "Post updated." : "Post published." });
       resetForm();
+      fetchPosts();
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -91,6 +111,7 @@ export function PostManager() {
     const result = await deletePost(id);
     if (result.success) {
       toast({ title: "Success", description: "Post removed." });
+      fetchPosts();
     } else {
       toast({ variant: "destructive", title: "Error", description: result.error });
     }
@@ -249,8 +270,20 @@ export function PostManager() {
         </CardHeader>
         <CardContent>
           {fetching ? (
-            <div className="text-center py-4">Loading posts...</div>
-          ) : posts?.length === 0 ? (
+            <div className="text-center py-8 flex flex-col items-center gap-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-primary" />
+              <div className="text-muted-foreground">Loading posts...</div>
+            </div>
+          ) : fetchError ? (
+            <div className="text-center py-8 border-2 border-destructive/20 rounded-lg bg-destructive/5">
+                <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-2" />
+                <p className="font-semibold text-destructive">Error Loading Posts</p>
+                <p className="text-sm text-destructive-foreground/70 mb-4">{fetchError}</p>
+                <Button variant="outline" size="sm" onClick={fetchPosts} className="gap-2">
+                    <RefreshCw className="w-4 h-4" /> Try Again
+                </Button>
+            </div>
+          ) : posts.length === 0 ? (
             <div className="text-center py-4 text-muted-foreground">No posts found.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -33,7 +33,11 @@ export async function getPosts({
     });
 
     const lastDoc = posts[posts.length - 1];
-    const nextCursor = lastDoc ? lastDoc.timestamp.toISOString() : null;
+    const nextCursor = lastDoc
+      ? typeof lastDoc.timestamp === "string"
+        ? lastDoc.timestamp
+        : lastDoc.timestamp.toISOString()
+      : null;
 
     return {
       success: true,
@@ -80,7 +84,11 @@ export async function getVideos({
     });
 
     const lastDoc = videos[videos.length - 1];
-    const nextCursor = lastDoc ? lastDoc.timestamp.toISOString() : null;
+    const nextCursor = lastDoc
+      ? typeof lastDoc.timestamp === "string"
+        ? lastDoc.timestamp
+        : lastDoc.timestamp.toISOString()
+      : null;
 
     return {
       success: true,

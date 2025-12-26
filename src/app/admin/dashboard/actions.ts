@@ -240,6 +240,23 @@ export async function deleteVideo(id: string) {
   }
 }
 
+export async function getVideos() {
+  try {
+    const snapshot = await db
+      .collection("videos")
+      .orderBy("timestamp", "desc")
+      .get();
+    const videos = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...serializeFirestoreData(doc.data()),
+    }));
+    return { success: true, data: videos };
+  } catch (error: any) {
+    console.error("Error fetching videos:", error);
+    return { success: false, error: error.message || "Failed to fetch videos" };
+  }
+}
+
 // Post Actions
 export async function addPost(
   title: string,
@@ -305,5 +322,22 @@ export async function deletePost(id: string) {
   } catch (error) {
     console.error("Error deleting post:", error);
     return { success: false, error: "Failed to delete post." };
+  }
+}
+
+export async function getPosts() {
+  try {
+    const snapshot = await db
+      .collection("posts")
+      .orderBy("timestamp", "desc")
+      .get();
+    const posts = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...serializeFirestoreData(doc.data()),
+    }));
+    return { success: true, data: posts };
+  } catch (error: any) {
+    console.error("Error fetching posts:", error);
+    return { success: false, error: error.message || "Failed to fetch posts" };
   }
 }
