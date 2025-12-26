@@ -1,6 +1,13 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const getResend = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+  return new Resend(apiKey);
+};
+
 const ADMIN_EMAIL = "drbmsathyaramacharya@gmail.com";
 const REPLY_TO_EMAIL = "virudhhiedu.consultant@gmail.com";
 const ADMIN_NAME_EN = "Shri. Uba. Ve. B. M. Sathya Ram Acharya";
@@ -127,7 +134,8 @@ interface EmailParams {
 }
 
 async function sendEmail({ to, subject, html }: EmailParams) {
-  if (!process.env.RESEND_API_KEY) {
+  const resend = getResend();
+  if (!resend) {
     console.warn("[Email] Skipping email send: RESEND_API_KEY not found.");
     return { success: false, error: "API Key missing" };
   }
@@ -376,7 +384,7 @@ export async function sendScheduleUpdateEmail(inquiry: any) {
         <p>If this new time does not work for you, please contact us at <strong>${CONTACT_PHONE}</strong> immediately.</p>
         <p>Namaste,<br/><strong>${GET_ADMIN_NAME(isTamil)}</strong></p>
       </div>
-      ${GET_FOOTER_HTML()}
+      ${GET_FOOTER_HTML(isTamil)}
     </div>
   `;
 
