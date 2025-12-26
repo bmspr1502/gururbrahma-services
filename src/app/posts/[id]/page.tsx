@@ -11,9 +11,33 @@ import { Post } from '@/lib/types';
 import { serializeFirestoreData } from '@/lib/utils';
 import { Carousel } from '@/components/carousel';
 
+import type { Metadata } from 'next';
+
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const doc = await db.collection('posts').doc(id).get();
+    if (doc.exists) {
+      const post = doc.data() as Post;
+      return {
+        title: post.title,
+        description: post.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...',
+        openGraph: {
+          title: post.title,
+          description: post.content.replace(/<[^>]*>/g, '').substring(0, 160) + '...',
+          images: post.imageUrl ? [post.imageUrl] : [],
+        }
+      };
+    }
+  } catch (e) {
+    console.error("Metadata error:", e);
+  }
+  return { title: 'Post Detail' };
+}
 
 interface ExtendedPost extends Post {
   images?: string[];

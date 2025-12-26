@@ -1,10 +1,13 @@
-
+import type { Metadata } from 'next';
 import { db } from '@/firebase/server';
 import { Post } from '@/lib/types';
 import { serializeFirestoreData } from '@/lib/utils';
 import { PostsFeed } from '@/components/posts-feed';
 
-export const dynamic = 'force-dynamic';
+export const metadata: Metadata = {
+  title: 'Spiritual Blog',
+  description: 'Explore articles on Vedic astrology, spiritual practices, and festival significations to enlighten your path through traditional wisdom.',
+};
 
 export default async function PostsPage() {
   let initialPosts: Post[] = [];

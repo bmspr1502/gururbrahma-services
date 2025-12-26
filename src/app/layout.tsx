@@ -10,8 +10,11 @@ import { Analytics } from '@/components/analytics';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://gururbrahma.in'),
-  title: 'Gururbrahma Services | Guiding Your Spiritual Journey',
-  description: 'Guiding your spiritual journey through Vedic traditions. Professional priest and astrologer services.',
+  title: {
+    default: 'Gururbrahma Services | Guiding Your Spiritual Journey',
+    template: '%s | Gururbrahma Services'
+  },
+  description: 'Guiding your spiritual journey through Vedic traditions. Professional priest and astrologer services including Purohitam, Jyotisham, and Spiritual Teaching.',
   manifest: '/icons/manifest.json',
   appleWebApp: {
     capable: true,
@@ -23,6 +26,8 @@ export const metadata: Metadata = {
     description: 'Guiding your spiritual journey through Vedic traditions.',
     type: 'website',
     url: 'https://gururbrahma.in',
+    siteName: 'Gururbrahma Services',
+    locale: 'en_IN',
     images: [
       {
         url: '/logo.png',
@@ -31,6 +36,12 @@ export const metadata: Metadata = {
         alt: 'Gururbrahma Services Logo',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gururbrahma Services',
+    description: 'Guiding your spiritual journey through Vedic traditions.',
+    images: ['/logo.png'],
   },
   icons: {
     icon: [

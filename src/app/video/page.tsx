@@ -1,11 +1,14 @@
-
+import type { Metadata } from 'next';
 import { db } from '@/firebase/server';
 import { Video } from '@/lib/types';
 import { Youtube } from 'lucide-react';
 import { serializeFirestoreData } from '@/lib/utils';
 import { VideosFeed } from '@/components/videos-feed';
 
-export const dynamic = 'force-dynamic';
+export const metadata: Metadata = {
+  title: 'Sacred Videos',
+  description: 'Watch our latest videos on spiritual events, Vedic rituals, and insights into the divine path. Live sessions and recorded discourses.',
+};
 
 export default async function VideosPage() {
   let initialVideos: Video[] = [];

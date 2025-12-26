@@ -1,9 +1,19 @@
+import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { AdminLoginForm } from './login-form';
 import { auth, db } from '@/firebase/server';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Admin Login',
+  description: 'Secure login for Gururbrahma Services administrators.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function AdminPage() {
   const cookieStore = await cookies();
