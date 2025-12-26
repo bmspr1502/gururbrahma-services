@@ -65,7 +65,7 @@ export async function generateCustomToken() {
   const session = (await cookies()).get("__session")?.value;
   if (!session) {
     console.log("[Auth] No session cookie found for custom token generation.");
-    return null;
+    return { success: false, error: "No session cookie found" };
   }
 
   try {
@@ -78,20 +78,27 @@ export async function generateCustomToken() {
         "[Auth] Custom token created successfully for UID:",
         decodedClaims.uid
       );
-      return customToken;
+      return { success: true, token: customToken };
     } catch (tokenError: any) {
       console.error(
         "[Auth] Error creating custom token (Admin SDK):",
         tokenError.code || "unknown_code",
         tokenError.message || tokenError
       );
-      // Specifically helpful for Service Account Token Creator role issues
-      if (tokenError.code === "auth/insufficient-permission") {
+
+      let errorMsg = tokenError.message || "Failed to create custom token";
+      if (
+        tokenError.code === "auth/insufficient-permission" ||
+        errorMsg.includes("signBlob")
+      ) {
+        errorMsg =
+          "PERMISSION_DENIED: Service account needs 'Service Account Token Creator' role.";
         console.error(
           "[Auth] HINT: The service account may need 'Service Account Token Creator' role in Google Cloud Console."
         );
       }
-      return null;
+
+      return { success: false, error: errorMsg, code: tokenError.code };
     }
   } catch (error: any) {
     console.error(
@@ -99,6 +106,10 @@ export async function generateCustomToken() {
       error.code || "unknown_code",
       error.message || error
     );
-    return null;
+    return {
+      success: false,
+      error: "Session verification failed",
+      code: error.code,
+    };
   }
 }

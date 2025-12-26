@@ -15,16 +15,19 @@ export function AuthSync() {
       if (!auth.currentUser) {
         console.log("[AuthSync] No client auth detected. Attempting sync...");
         try {
-          const token = await generateCustomToken();
-          if (token) {
+          const result = await generateCustomToken();
+          if (result && result.success && result.token) {
             try {
-              await signInWithCustomToken(auth, token);
+              await signInWithCustomToken(auth, result.token);
               console.log("[AuthSync] Client SDK authenticated successfully via custom token.");
             } catch (error) {
               console.error("[AuthSync] Failed to sign in with custom token:", error);
             }
           } else {
-            console.warn("[AuthSync] No custom token received from server (session might be missing).");
+            console.warn(
+              "[AuthSync] No custom token received from server:",
+              result?.error || "Unknown error"
+            );
           }
         } catch (serverError) {
           console.error("[AuthSync] Server error while fetching custom token:", serverError);

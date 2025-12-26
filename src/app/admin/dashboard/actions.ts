@@ -20,41 +20,36 @@ export async function getInquiries(showClosed = false) {
     }
 
     const snapshot = await query.get();
-    console.log(
-      "[Inquiries] Database query successful, docs count:",
-      snapshot.size
-    );
+
+    console.log("[Inquiries] Found docs:", snapshot.size);
 
     const inquiries = snapshot.docs.map((doc: any) => {
       try {
-        const data = serializeFirestoreData(doc.data());
+        const rawData = doc.data();
+        const data = serializeFirestoreData(rawData);
         return {
           id: doc.id,
           ...data,
         };
-      } catch (e) {
-        console.error(`[Inquiries] Error serializing doc ${doc.id}:`, e);
+      } catch (e: any) {
+        console.error(
+          `[Inquiries] Serialization failed for ${doc.id}:`,
+          e.message
+        );
         return { id: doc.id, error: "Serialization failed" };
       }
     });
 
-    console.log("[Inquiries] Serialization complete");
     return { success: true, data: inquiries };
   } catch (error: any) {
-    console.error(
-      "[Inquiries] Error fetching inquiries:",
-      error.code || "unknown",
-      error.message || error
-    );
-    // Specifically handle index errors which are common with new filters/sorts
-    if (error.message?.includes("index")) {
-      return {
-        success: false,
-        error:
-          "This view requires a database index. Please check the server logs for the creation link.",
-      };
-    }
-    return { success: false, error: "Failed to fetch inquiries." };
+    console.error("[Inquiries] Top-level error:", error.message || error);
+
+    // Return a valid object that WON'T crash the server component render
+    return {
+      success: false,
+      error: error.message || "Failed to fetch inquiries",
+      isIndexError: error.message?.includes("index") || error.code === 9,
+    };
   }
 }
 

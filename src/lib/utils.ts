@@ -8,8 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export function serializeFirestoreData(data: any): any {
   if (data === null || data === undefined) return data;
 
-  // Handle Dates - convert to ISO string for absolute serialization safety in Next.js 15
+  // Handle Dates & Timestamps - convert to ISO string
   if (data instanceof Date) return data.toISOString();
+  if (typeof data.toDate === "function") return data.toDate().toISOString();
 
   // Handle arrays
   if (Array.isArray(data)) {
@@ -18,25 +19,30 @@ export function serializeFirestoreData(data: any): any {
 
   // Handle objects
   if (typeof data === "object") {
-    // Check for Firestore Timestamp
-    if (typeof data.toDate === "function") {
-      return data.toDate().toISOString();
-    }
-
-    // Check for Timestamp properties if already plain object
+    // Check for Timestamp properties from JSON representation
     if ("_seconds" in data && "_nanoseconds" in data) {
       return new Date(data._seconds * 1000).toISOString();
     }
 
-    // Only recurse into plain objects to avoid issues with complex classes/references
-    if (data.constructor === Object) {
+    // Only serialize plain objects
+    // Using a more robust check for plain objects
+    const isPlainObject =
+      data.constructor === Object || data.constructor === undefined;
+
+    if (isPlainObject) {
       const serialized: any = {};
       for (const key in data) {
-        serialized[key] = serializeFirestoreData(data[key]);
+        if (Object.prototype.hasOwnProperty.call(data, key)) {
+          serialized[key] = serializeFirestoreData(data[key]);
+        }
       }
       return serialized;
     }
+
+    // If it's not a plain object, try to convert to string to avoid serialization errors
+    return String(data);
   }
 
+  // Return primitives (string, number, boolean) as is
   return data;
 }
