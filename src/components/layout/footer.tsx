@@ -1,9 +1,11 @@
+"use client";
+
 import Link from 'next/link';
 import { Youtube, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { Logo } from '@/components/logo';
+import { useLanguage } from '@/context/language-context';
 
 const OmSymbol = () => (
-   // ... 
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -14,8 +16,8 @@ const OmSymbol = () => (
   </svg>
 );
 
-
 export function Footer({ isAdmin = false }: { isAdmin?: boolean }) {
+  const { t } = useLanguage();
   
   return (
     <footer className={`relative overflow-hidden transition-colors duration-300 ${isAdmin ? "bg-black text-white" : "bg-primary text-primary-foreground"}`}>
@@ -29,10 +31,10 @@ export function Footer({ isAdmin = false }: { isAdmin?: boolean }) {
             </div>
             <div className="text-center lg:text-left space-y-4">
               <h3 className="font-headline text-3xl md:text-4xl font-bold tracking-tight">
-                Gururbrahma Services
+                {t('brand_name')}
               </h3>
               <p className="text-lg md:text-xl text-primary-foreground/70 max-w-md leading-relaxed">
-                Guiding your spiritual journey through Vedantic traditions and Vedic rituals with wisdom and devotion.
+                {t('hero_subtitle')}
               </p>
             </div>
           </div>
@@ -42,20 +44,20 @@ export function Footer({ isAdmin = false }: { isAdmin?: boolean }) {
             <div>
               <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-2">
                 <span className="w-8 h-[2px] bg-accent"></span>
-                Quick Links
+                {t('quick_links')}
               </h3>
               <ul className="grid grid-cols-1 gap-4 text-primary-foreground/80">
-                <li><Link href="/services" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">Services</Link></li>
-                <li><Link href="/posts" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">Posts</Link></li>
-                <li><Link href="/video" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">Videos</Link></li>
-                <li><Link href="/contact" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">Contact</Link></li>
+                <li><Link href="/services" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">{t('services')}</Link></li>
+                <li><Link href="/posts" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">{t('posts')}</Link></li>
+                <li><Link href="/video" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">{t('videos')}</Link></li>
+                <li><Link href="/contact" className="hover:text-accent hover:translate-x-1 transition-all flex items-center gap-2">{t('contact')}</Link></li>
               </ul>
             </div>
 
             <div>
               <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-2">
                 <span className="w-8 h-[2px] bg-accent"></span>
-                Follow Us
+                {t('connect_with_us')}
               </h3>
               <div className="flex flex-wrap gap-4">
                 <Link href="https://www.youtube.com/@gururbrahma" target="_blank" className="p-3 rounded-xl bg-white/5 hover:bg-accent hover:text-accent-foreground transition-all duration-300">
@@ -80,7 +82,7 @@ export function Footer({ isAdmin = false }: { isAdmin?: boolean }) {
           <OmSymbol />
         </div>
         <div className="mt-8 border-t border-primary-foreground/20 pt-4 text-center text-sm text-primary-foreground/60">
-          <p>&copy; {new Date().getFullYear()} Gururbrahma Services. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {t('brand_name')}. {t('footer_rights')}</p>
         </div>
       </div>
     </footer>

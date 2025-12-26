@@ -14,4 +14,5 @@ export const FormSchema = z.object({
     .min(1, { message: "A preferred time is required." }),
   description: z.string().optional(),
   rashiNakshatra: z.string().optional(),
+  language: z.enum(["en", "ta"]),
 });

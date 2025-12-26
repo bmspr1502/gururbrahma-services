@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/button";
 import type { Post } from "@/lib/types";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
+import { useLanguage } from "@/context/language-context";
+
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const { t } = useLanguage();
   // Determine the display image
   let displayImageUrl = post.imageUrl;
   let displayImageHint = 'blog post';
@@ -63,7 +66,9 @@ export function PostCard({ post }: PostCardProps) {
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <Button asChild variant="link" className="p-0 text-primary hover:text-secondary">
-            <Link href={`/posts/${post.id}`}>Read More</Link>
+            <Link href={`/posts/${post.id}`}>
+              {t('learn_more' as any) || 'Read More'}
+            </Link>
           </Button>
         </CardFooter>
       </Card>

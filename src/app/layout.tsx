@@ -35,6 +35,8 @@ export const metadata: Metadata = {
 import { cookies } from 'next/headers';
 import { auth } from '@/firebase/server';
 
+import { LanguageProvider } from '@/context/language-context';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -72,16 +74,18 @@ export default async function RootLayout({
         ></script>
       </head>
       <body className={cn('font-body antialiased min-h-screen flex flex-col')}>
-        <FirebaseClientProvider>
-          <BackgroundPattern />
-          <Header isAdmin={isAdmin} />
-          <div className="flex-grow pt-16">
-            {children}
-          </div>
-          <Footer isAdmin={isAdmin} />
-          <Toaster />
-          <Analytics />
-        </FirebaseClientProvider>
+        <LanguageProvider>
+          <FirebaseClientProvider>
+            <BackgroundPattern />
+            <Header isAdmin={isAdmin} />
+            <div className="flex-grow pt-16">
+              {children}
+            </div>
+            <Footer isAdmin={isAdmin} />
+            <Toaster />
+            <Analytics />
+          </FirebaseClientProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

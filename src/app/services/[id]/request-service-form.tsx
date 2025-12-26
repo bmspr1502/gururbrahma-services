@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
- import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CalendarIcon } from "lucide-react";
@@ -26,17 +26,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { requestServiceAction } from "./actions";
 import { FormSchema } from "./schema";
+import { useLanguage } from "@/context/language-context";
+import { RASHI_DATA } from "@/lib/astrology-data";
+import type { ServiceCategory } from "@/lib/types";
 
 type RequestServiceFormProps = {
   serviceId: string;
   serviceName: string;
+  category: ServiceCategory;
 };
 
-export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFormProps) {
+export function RequestServiceForm({ serviceId, serviceName, category }: RequestServiceFormProps) {
   const { toast } = useToast();
+  const { t, language } = useLanguage();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -51,32 +63,64 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
       preferredTime: "",
       description: "",
       rashiNakshatra: "",
+      language,
     },
   });
+
+  // Keep language in sync with context
+  useEffect(() => {
+    form.setValue("language", language);
+  }, [language, form]);
+
+  const [selectedRashi, setSelectedRashi] = useState<string>("");
+  const [selectedNakshatra, setSelectedNakshatra] = useState<string>("");
+
+  // Sync rashiNakshatra field when dropdowns change
+  useEffect(() => {
+    if (selectedRashi && selectedNakshatra) {
+      const rashi = RASHI_DATA.find(r => r.id === selectedRashi);
+      const nakshatra = rashi?.nakshatras.find(n => n.id === selectedNakshatra);
+      
+      if (rashi && nakshatra) {
+        // We store the display string in rashiNakshatra for the inquiry details
+        const combined = `${rashi[language]} - ${nakshatra[language]}`;
+        form.setValue("rashiNakshatra", combined);
+      }
+    } else {
+      form.setValue("rashiNakshatra", "");
+    }
+  }, [selectedRashi, selectedNakshatra, language, form]);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     const result = await requestServiceAction(data);
 
     if (result.success) {
       toast({
-        title: "Inquiry Sent!",
-        description: "We have received your request and will contact you shortly.",
+        title: t('inquiry_sent_title'),
+        description: t('inquiry_sent_desc'),
       });
       form.reset();
+      setSelectedRashi("");
+      setSelectedNakshatra("");
     } else {
       toast({
         variant: "destructive",
-        title: "Something went wrong",
-        description: result.message || "Could not send your request. Please try again.",
+        title: t('something_went_wrong'),
+        description: result.message || t('inquiry_error_desc'),
       });
     }
   }
 
+  const currentRashi = RASHI_DATA.find(r => r.id === selectedRashi);
+  const showAstrologyFields = category !== "Teaching";
+
   return (
     <Card className="shadow-xl bg-card/90 backdrop-blur-sm border-primary/20">
       <CardHeader>
-        <CardTitle>Request This Service</CardTitle>
-        <CardDescription>Fill out the form below to inquire about "{serviceName}".</CardDescription>
+        <CardTitle>{t('request_service')}</CardTitle>
+        <CardDescription>
+          {t('request_service_desc').replace('{serviceName}', serviceName)}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -87,10 +131,10 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1">
-                    Full Name <span className="text-destructive">*</span>
+                    {t('full_name')} <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Your full name" {...field} />
+                    <Input placeholder={t('full_name')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -102,7 +146,7 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1">
-                    Email Address <span className="text-destructive">*</span>
+                    {t('email_address')} <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="yourname@example.com" {...field} />
@@ -111,71 +155,71 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-1">
-                      Phone Number <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your contact number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <FormField
-                control={form.control}
-                name="preferredDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="flex items-center gap-1">
-                      Preferred Date <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full pl-3 text-left font-normal border-primary/20 hover:border-primary/50",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={(date) => {
-                            field.onChange(date);
-                            setIsCalendarOpen(false);
-                          }}
-                          disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            return date < today;
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    {t('phone_number')} <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder={t('phone_number')} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="preferredDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="flex items-center gap-1">
+                    {t('preferred_date')} <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal border-primary/20 hover:border-primary/50",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>{t('pick_a_date')}</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          field.onChange(date);
+                          setIsCalendarOpen(false);
+                        }}
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today;
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <FormField
               control={form.control}
@@ -183,7 +227,7 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1">
-                    Preferred Time <span className="text-destructive">*</span>
+                    {t('preferred_time')} <span className="text-destructive">*</span>
                   </FormLabel>
                    <FormControl>
                     <Input type="time" {...field} />
@@ -198,10 +242,10 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Details / Special Requests</FormLabel>
+                  <FormLabel>{t('details_label')}</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Tell us more about your requirement..." 
+                      placeholder={t('details_placeholder')} 
                       className="min-h-[100px]"
                       {...field} 
                     />
@@ -210,21 +254,56 @@ export function RequestServiceForm({ serviceId, serviceName }: RequestServiceFor
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="rashiNakshatra"
-              render={({ field }) => (
+
+            {showAstrologyFields && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormItem>
-                  <FormLabel>Rashi / Nakshatra (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Mesha / Ashwini" {...field} />
-                  </FormControl>
-                  <FormMessage />
+                  <FormLabel>{t('rashi_label')}</FormLabel>
+                  <Select value={selectedRashi} onValueChange={(val) => {
+                    setSelectedRashi(val);
+                    setSelectedNakshatra(""); // Reset nakshatra when rashi changes
+                  }}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('select_rashi')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {RASHI_DATA.map((rashi) => (
+                        <SelectItem key={rashi.id} value={rashi.id}>
+                          {rashi[language]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormItem>
-              )}
-            />
+
+                <FormItem>
+                  <FormLabel>{t('nakshatra_label')}</FormLabel>
+                  <Select 
+                    value={selectedNakshatra} 
+                    onValueChange={setSelectedNakshatra}
+                    disabled={!selectedRashi}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('select_nakshatra')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {currentRashi?.nakshatras.map((nakshatra) => (
+                        <SelectItem key={nakshatra.id} value={nakshatra.id}>
+                          {nakshatra[language]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              </div>
+            )}
+
             <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Sending..." : "Send Inquiry"}
+              {form.formState.isSubmitting ? t('sending') : t('send_inquiry')}
             </Button>
           </form>
         </Form>

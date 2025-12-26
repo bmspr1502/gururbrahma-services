@@ -1,12 +1,17 @@
-import { Mail, Phone, MapPin, Youtube, Facebook, Instagram, MessageCircle, Map as MapIcon } from 'lucide-react';
+"use client";
+
+import { Mail, Phone, MapPin, Youtube, Facebook, Instagram, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { useLanguage } from '@/context/language-context';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
+  
   // Replace these with actual details
   const contactDetails = {
-    name: "ஸ்ரீ உப வே பூ மா ஸத்யராம் ஆச்சார்யர்",
+    name: t('founder_name'),
     phone: "+91 94435 14199",
     whatsapp: "https://wa.me/919443514199",
     email: "virudhhiedu.consultant@gmail.com",
@@ -16,12 +21,13 @@ export default function ContactPage() {
     address: "'SHRI RAM BHAVANAM', 53/74, Bungalow Street, Salem - 636 001 (TN, India)",
     mapEmbedUrl: "https://www.google.com/maps/embed?pb=!4v1766556041993!6m8!1m7!1slLKcNW0tETHCFN_IdlQ_Qg!2m2!1d11.65960870541327!2d78.16945247571024!3f52.5357645612802!4f-1.3999530754026637!5f0.7820865974627469"
   };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Contact Us</h1>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">{t('contact')}</h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Reach out to us for spiritual guidance, Purohitam services, and Jyotisham consultations.
+          {t('hero_subtitle')}
         </p>
       </div>
 
@@ -30,10 +36,9 @@ export default function ContactPage() {
         <Card className="shadow-2xl overflow-hidden border-primary/20 bg-card/50 backdrop-blur-sm">
           <div className="md:flex">
             <div className="md:w-1/3 relative h-64 md:h-auto overflow-hidden bg-muted">
-              {/* Replace with actual picture */}
               <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-accent/10">
                  <Image 
-                   src="https://firebasestorage.googleapis.com/v0/b/studio-5159116962-cf239.firebasestorage.app/o/posts%2FnNwjQxQJLI5TkM16ZyjN%2Fimages%2F1766646262302_WhatsApp%20Image%202025-04-14%20at%2019.30.01.jpeg?alt=media&token=719e07e5-1693-4dc9-ab39-30e369aa1b94" // Placeholder or actual image
+                   src="https://firebasestorage.googleapis.com/v0/b/studio-5159116962-cf239.firebasestorage.app/o/posts%2FnNwjQxQJLI5TkM16ZyjN%2Fimages%2F1766646262302_WhatsApp%20Image%202025-04-14%20at%2019.30.01.jpeg?alt=media&token=719e07e5-1693-4dc9-ab39-30e369aa1b94"
                    alt={contactDetails.name}
                    fill
                    className="object-cover"
