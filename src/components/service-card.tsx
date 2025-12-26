@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import type { Service } from "@/lib/types";
 
+import { useLanguage } from "@/context/language-context";
+
 interface ServiceCardProps {
   service: Service;
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
+  const { t } = useLanguage();
   // Resolve icon component client-side from a string key to avoid passing functions
   const Icon = (Icons as any)[service.icon] ?? Icons.Home;
 
@@ -26,15 +29,15 @@ export function ServiceCard({ service }: ServiceCardProps) {
           <div className="bg-primary/10 p-4 rounded-full text-primary">
             <Icon className="w-8 h-8" />
           </div>
-          <CardTitle className="mt-4">{service.name}</CardTitle>
+          <CardTitle className="mt-4">{t(service.name as any)}</CardTitle>
         </CardHeader>
         <CardContent className="flex-grow">
-          <CardDescription>{service.description}</CardDescription>
+          <CardDescription>{t(service.description as any)}</CardDescription>
         </CardContent>
         <CardFooter className="justify-center">
           <Button asChild variant="secondary">
             <Link href={`/services/${service.id}`}>
-              Learn More <ArrowRight className="ml-2 h-4 w-4" />
+              {t('learn_more' as any) || 'Learn More'} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </CardFooter>

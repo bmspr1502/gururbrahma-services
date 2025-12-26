@@ -1,6 +1,6 @@
 import type React from "react";
 
-export type ServiceCategory = "Purohitam" | "Jyotisham";
+export type ServiceCategory = "Purohitam" | "Jyotisham" | "Teaching";
 
 export type Service = {
   id: string;

@@ -11,97 +11,150 @@ import {
 import type { Service, Post, Video } from "./types";
 
 export const services: Service[] = [
+  // Purohitam
   {
     id: "sudarshana-homam",
     category: "Purohitam",
-    name: "Sudarshana Homam",
-    description:
-      "A powerful fire ritual to remove obstacles and negative energies.",
+    name: "sudarshana_homam_name",
+    description: "sudarshana_homam_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>The Sudarshana Homam is one of the most effective homams for any person to overcome their enemies and sufferings. This homam is performed to accomplish any desire and for any purpose.</p>",
+    detailedHtml: "sudarshana_homam_detail",
     icon: "Shield",
     image: "service-sudarshana-homam",
   },
   {
     id: "ganapathi-homam",
     category: "Purohitam",
-    name: "Ganapathi Homam",
-    description: "Performed to ensure success and prosperity in new ventures.",
+    name: "ganapathi_homam_name",
+    description: "ganapathi_homam_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>Ganapathi Homam is performed to beget happiness, prosperity and good health. It is highly recommended to perform this homam before starting any new venture or project.</p>",
+    detailedHtml: "ganapathi_homam_detail",
     icon: "LayoutGrid",
     image: "service-ganapathi-homam",
   },
   {
-    id: "graha-pravesham",
+    id: "gruhapravesham",
     category: "Purohitam",
-    name: "Graha Pravesham",
-    description: "A housewarming ceremony to bless a new home.",
+    name: "gruhapravesham_name",
+    description: "gruhapravesham_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>Graha Pravesham, or housewarming ceremony, is an important ritual to purify the space and bring positive energy, peace, and prosperity to the new home and its inhabitants.</p>",
+    detailedHtml: "gruhapravesham_detail",
     icon: "Home",
     image: "service-graha-pravesham",
   },
   {
-    id: "kalyanam",
+    id: "muhurtham",
     category: "Purohitam",
-    name: "Kalyanams",
-    description:
-      "Sacred wedding ceremonies performed according to Vedic traditions.",
+    name: "muhurtham_name",
+    description: "muhurtham_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>We perform traditional Vedic wedding ceremonies (Kalyanam), invoking divine blessings for a long, happy, and prosperous married life for the couple.</p>",
+    detailedHtml: "muhurtham_detail",
     icon: "Gem",
     image: "service-kalyanam",
   },
   {
-    id: "jadhagam-analysis",
-    category: "Jyotisham",
-    name: "Jadhagam Analysis",
-    description: "In-depth analysis of your birth chart for life predictions.",
+    id: "upanyasam",
+    category: "Purohitam",
+    name: "upanyasam_name",
+    description: "upanyasam_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>A detailed analysis of your Jadhagam (birth chart) can reveal insights into your personality, strengths, weaknesses, and the course of your life. It helps in making informed decisions.</p>",
+    detailedHtml: "upanyasam_detail",
+    icon: "MessageCircle",
+    image: "service-general-advice", // Reuse advice image
+  },
+  {
+    id: "bhagavata-saptaaham",
+    category: "Purohitam",
+    name: "bhagavata_saptaaham_name",
+    description: "bhagavata_saptaaham_desc",
+    price: "Contact for details",
+    detailedHtml: "bhagavata_saptaaham_detail",
+    icon: "Users",
+    image: "service-compatibility-check", // Reuse compatibility image
+  },
+
+  // Jyotisham
+  {
+    id: "jadhaga-parivarthanai",
+    category: "Jyotisham",
+    name: "jadhaga_parivarthanai_name",
+    description: "jadhaga_parivarthanai_desc",
+    price: "Contact for details",
+    detailedHtml: "jadhaga_parivarthanai_detail",
     icon: "BookOpenCheck",
     image: "service-jadhagam-analysis",
   },
   {
     id: "compatibility-check",
     category: "Jyotisham",
-    name: "Compatibility Check",
-    description:
-      "Marriage matching based on astrological charts of the couple.",
+    name: "compatibility_check_name",
+    description: "compatibility_check_desc",
     price: "Contact for details",
-    detailedHtml:
-      "<p>Astrological compatibility check is crucial for a harmonious married life. We analyze the birth charts of the prospective bride and groom to assess their compatibility on various levels.</p>",
+    detailedHtml: "compatibility_check_detail",
     icon: "Users",
     image: "service-compatibility-check",
   },
   {
-    id: "general-advice",
-    category: "Jyotisham",
-    name: "General Advice",
-    description: "Astrological guidance for career, finance, and health.",
-    price: "Contact for details",
-    detailedHtml:
-      "<p>Get answers to your life's questions. We provide astrological guidance on matters related to career, finance, health, and relationships to help you navigate through life with clarity.</p>",
-    icon: "MessageCircle",
-    image: "service-general-advice",
-  },
-  {
     id: "matrimony-assistance",
     category: "Jyotisham",
-    name: "Matrimony Assistance",
-    description:
-      "Personal consultation to help find matches within the community.",
+    name: "matrimony_assistance_name",
+    description: "matrimony_assistance_desc",
     price: "Informational Only",
-    detailedHtml:
-      "<p>We help families find the right match within the Sourashtra community through personal consultation. This service is based on our extensive network and understanding of cultural values. We do not maintain a database of profiles online.</p>",
+    detailedHtml: "matrimony_assistance_detail",
     icon: "HeartHandshake",
     image: "service-matrimony-assistance",
+  },
+
+  // Teaching
+  {
+    id: "sanskrit-classes",
+    category: "Teaching",
+    name: "sanskrit_classes_name",
+    description: "sanskrit_classes_desc",
+    price: "Contact for details",
+    detailedHtml: "sanskrit_classes_detail",
+    icon: "BookOpenCheck",
+    image: "service-jadhagam-analysis",
+  },
+  {
+    id: "bhagavad-gita-classes",
+    category: "Teaching",
+    name: "srimad_bhagavad_gita_classes_name",
+    description: "srimad_bhagavad_gita_desc",
+    price: "Contact for details",
+    detailedHtml: "srimad_bhagavad_gita_classes_detail",
+    icon: "BookOpenCheck",
+    image: "service-jadhagam-analysis",
+  },
+  {
+    id: "divya-prabandham-classes",
+    category: "Teaching",
+    name: "divya_prabandham_classes_name",
+    description: "divya_prabandham_desc",
+    price: "Contact for details",
+    detailedHtml: "divya_prabandham_classes_detail",
+    icon: "BookOpenCheck",
+    image: "service-jadhagam-analysis",
+  },
+  {
+    id: "hindi-classes",
+    category: "Teaching",
+    name: "hindi_classes_name",
+    description: "hindi_classes_desc",
+    price: "Contact for details",
+    detailedHtml: "hindi_classes_detail",
+    icon: "BookOpenCheck",
+    image: "service-jadhagam-analysis",
+  },
+  {
+    id: "vishnu-sahasranamam-classes",
+    category: "Teaching",
+    name: "sri_vishnu_sahasranamam_classes_name",
+    description: "sri_vishnu_sahasranamam_desc",
+    price: "Contact for details",
+    detailedHtml: "sri_vishnu_sahasranamam_classes_detail",
+    icon: "BookOpenCheck",
+    image: "service-jadhagam-analysis",
   },
 ];
 
